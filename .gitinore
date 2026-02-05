@@ -1,0 +1,12 @@
+# Pasta de dependências (muito pesada)
+node_modules/
+
+# Arquivo de segredos e senhas (CRÍTICO)
+.env
+
+# Arquivos temporários de upload
+backend/uploads/*
+
+# Arquivos do VS Code e log de erros
+.vscode/
+npm-debug.log*
