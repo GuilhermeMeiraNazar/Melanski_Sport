@@ -76,7 +76,7 @@ function SidebarFilters({ mobileFilterOpen, setMobileFilterOpen }) {
                     <input type="checkbox" name="origem" /> Nacional
                 </label>
                 <label className="checkbox-label">
-                    <input type="checkbox" name="origem" /> Importada (Tailandesa)
+                    <input type="checkbox" name="origem" /> Internacional
                 </label>
             </div>
 
