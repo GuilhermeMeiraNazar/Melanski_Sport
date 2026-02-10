@@ -1,7 +1,20 @@
 /* _variables.scss */
-$vermelho-principal: #CC0000;
-$preto: #121212;
-$branco: #FFFFFF;
-$cinza-claro: #F2F2F2;
-$cinza-medio: #DCDCDC;
-$fonte-principal: 'Arial', sans-serif;
+
+// Cores Principais
+$vermelho-principal: #dc143c; // Atualizado conforme seu main.scss
+$preto: #111;
+$branco: #fff;
+
+// Cores Secundárias e Fundos
+$card-bg: #ffffff;
+$cinza-claro: #f8f8f8;
+$cinza-medio: #ddd;
+$background-body: #f7f7f7;
+$text-color: #333;
+
+// Sombras
+$shadow-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+// Tipografia
+$font-primary: 'Inter', sans-serif;
+$fonte-secundaria: 'Arial', sans-serif; // Mantido do original caso use

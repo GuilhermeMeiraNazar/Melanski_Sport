@@ -1,0 +1,151 @@
+/* _sidebar.scss */
+
+.sidebar-filters {
+    width: 270px;
+    flex-shrink: 0;
+    background-color: $branco;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: $shadow-suave;
+    position: sticky;
+    top: 150px;
+    height: fit-content;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    z-index: 40;
+
+    .filter-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        
+        .close-mobile {
+            display: none;
+        }
+    }
+
+    .filter-group {
+        margin-bottom: 25px;
+        h4 {
+            margin-bottom: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #999;
+            letter-spacing: 1px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #444;
+            cursor: pointer;
+            input { accent-color: $vermelho-principal; }
+            &:hover {
+                color: $vermelho-principal;
+            }
+            &.offer-highlight {
+                color: $vermelho-principal;
+                font-weight: bold;
+            }
+            &.launch-highlight {
+                color: #2ecc71;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .search-box {
+        position: relative;
+        margin-bottom: 10px;
+        input {
+            width: 100%;
+            padding: 10px 30px 10px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            &:focus {
+                border-color: $vermelho-principal;
+            }
+        }
+        svg {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+    }
+
+    .size-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        .size-label span {
+            display: flex;
+            justify-content: center;
+            padding: 8px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            &:hover {
+                border-color: $vermelho-principal;
+            }
+        }
+        input:checked + span {
+            background: $preto;
+            color: $branco;
+            border-color: $preto;
+        }
+        input {
+            display: none;
+        }
+    }
+
+    .btn-clear-filters {
+        width: 100%;
+        padding: 12px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        &:hover {
+            background-color: $preto;
+            color: $branco;
+        }
+    }
+}
+
+// Botão Flutuante Mobile (Controla a Sidebar)
+.mobile-filter-btn {
+    display: none;
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    background-color: $vermelho-principal;
+    color: $branco;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-weight: 800;
+    box-shadow: 0 8px 20px rgba(220, 20, 60, 0.4);
+    z-index: 2000;
+    cursor: pointer;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}

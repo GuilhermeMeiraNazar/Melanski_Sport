@@ -1,0 +1,25 @@
+/* _pagination.scss */
+
+.pagination {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    .page-control {
+        background-color: $branco;
+        border: 1px solid #ddd;
+        padding: 10px 18px;
+        border-radius: 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        &:hover:not(:disabled) {
+            background-color: $preto;
+            color: $branco;
+        }
+        &:disabled {
+            opacity: 0.4;
+        }
+    }
+}

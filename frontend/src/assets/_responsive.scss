@@ -1,0 +1,86 @@
+/* _responsive.scss */
+
+@media (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        padding-top: 130px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .mobile-filter-btn { display: flex; }
+    
+    /* Sidebar Gaveta */
+    .sidebar-filters {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        height: 100vh;
+        max-height: 100vh;
+        z-index: 9999;
+        border-radius: 0 16px 16px 0;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 20px;
+        &.open {
+            left: 0;
+        }
+        .filter-header .close-mobile { display: block; font-size: 1.5rem; padding: 5px; }
+    }
+    
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    
+    .product-card .card-info {
+        padding: 10px;
+        h3 {
+            font-size: 0.8rem;
+            height: 35px;
+            overflow: hidden;
+        }
+        .price { font-size: 1rem; }
+        .btn-buy { padding: 8px; font-size: 0.75rem; }
+    }
+
+    /* --- ADAPTAÇÃO DO MODAL PARA MOBILE --- */
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .modal-content { height: 100vh; max-height: 100vh; border-radius: 0; }
+    
+    .modal-body-grid { display: flex; flex-direction: column; }
+    
+    .modal-content .modal-close {
+        position: fixed; top: 15px; left: 15px; right: auto;
+        background: $branco; width: 35px; height: 35px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        color: #333;
+    }
+    
+    .modal-gallery { 
+        padding: 0; 
+        background-color: #f5f5f5;
+        
+        .main-photo-frame { 
+            height: 350px; 
+            border: none; 
+            border-radius: 0;
+            background-color: $branco;
+        }
+        
+        .thumbnails-scroll { display: none; }
+    }
+    
+    .modal-details {
+        border-left: none; 
+        margin-top: -20px; 
+        border-radius: 20px 20px 0 0;
+        position: relative; 
+        background: $branco;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        min-height: 500px;
+    }
+}

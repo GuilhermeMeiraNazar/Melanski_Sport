@@ -1,0 +1,88 @@
+/* _header.scss */
+
+.header-container {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5000;
+    background-color: $preto;
+
+    .top-bar {
+        @include flex-center;
+        background-color: $vermelho-principal;
+        color: $branco;
+        font-size: 0.7rem;
+        padding: 8px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+
+        .top-links {
+            @include flex-center;
+            gap: 20px;
+            span {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+        }
+    }
+
+    .main-header {
+        background-color: rgba(17, 17, 17, 0.98);
+        backdrop-filter: blur(12px);
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        .header-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 25px;
+            @include flex-center;
+            justify-content: space-between;
+            align-items: center;
+
+            .logo h1 {
+                font-size: 1.6rem;
+                font-weight: 900;
+                color: $branco;
+                font-style: italic;
+                span {
+                    color: $vermelho-principal;
+                }
+            }
+
+            .header-icons {
+                @include flex-center;
+                gap: 20px;
+                color: $branco;
+                align-items: center;
+                margin-left: auto;
+
+                .cart-icon {
+                    position: relative;
+                    font-size: 1.56rem;
+                    cursor: pointer;
+
+                    .cart-count {
+                        @include flex-center;
+                        top: -8px;
+                        right: -10px;
+                        background-color: $vermelho-principal;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 50%;
+                        font-size: 0.6rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 900;
+                    }
+                }
+            }
+        }
+    }
+}

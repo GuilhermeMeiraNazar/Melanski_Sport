@@ -1,0 +1,14 @@
+/* _base.scss */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: $font-primary;
+}
+
+body {
+    background-color: $background-body;
+    color: $text-color;
+    overflow-x: hidden;
+}
