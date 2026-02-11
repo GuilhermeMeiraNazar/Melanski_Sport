@@ -1,21 +1,17 @@
 /* main.scss */
-
 // 1. Configurações e Ferramentas
 @import 'variables';
 @import 'mixins';
-
 // 2. Base
 @import 'base';
-
 // 3. Layout e Estrutura
 @import 'layout';
-
 // 4. Componentes 
 @import 'header';
 @import 'sidebar';
 @import 'products';
 @import 'pagination';
 @import 'modal';
-
+@import 'cart';
 // 5. Responsividade Global
 @import 'responsive';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 
-function Modal({ selectedProduct, closeModal }) {
+function Modal({ selectedProduct, closeModal, addToCart }) {
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState(null);
 
@@ -10,6 +10,16 @@ function Modal({ selectedProduct, closeModal }) {
     const images = selectedProduct.images || [];
     const sizes = selectedProduct.sizes || [];
     const discount = Math.round(((selectedProduct.oldPrice - selectedProduct.price) / selectedProduct.oldPrice) * 100);
+
+    // Função interna para validar e chamar a prop do pai
+    const onAddClick = () => {
+        if (!selectedSize) {
+            alert("Por favor, selecione um tamanho antes de adicionar.");
+            return;
+        }
+        // Chama a função passada pelo App.jsx
+        addToCart(selectedProduct, selectedSize);
+    };
 
     return (
         <div className="modal-overlay" onClick={closeModal}>
@@ -58,19 +68,13 @@ function Modal({ selectedProduct, closeModal }) {
                             </div>
                         </div>
 
-                        {/* DESCRIÇÃO DO PRODUTO (NOVO CAMPO) */}
                         <div className="product-description">
                             <h3>Descrição</h3>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                                Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris 
-                                nisi ut aliquip ex ea commodo consequat.
-                            </p>
+                            <p>{selectedProduct.description}</p>
                         </div>
 
                         <div className="variations-section">
-                            <label>Tamanho:</label>
+                            <label>Tamanho: <span style={{fontWeight: 'normal', color: selectedSize ? '#dc143c' : '#999'}}>{selectedSize || 'Selecione'}</span></label>
                             <div className="size-selector">
                                 {sizes.map(size => (
                                     <button 
@@ -86,7 +90,9 @@ function Modal({ selectedProduct, closeModal }) {
 
                         <div className="action-buttons">
                             <button className="btn-buy-now">Comprar agora</button>
-                            <button className="btn-add-cart">
+                            
+                            {/* BOTÃO ALTERADO AQUI */}
+                            <button className="btn-add-cart" onClick={onAddClick}>
                                 <FaShoppingCart /> Adicionar ao carrinho
                             </button>
                         </div>

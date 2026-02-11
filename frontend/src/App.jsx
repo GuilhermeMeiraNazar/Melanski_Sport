@@ -5,35 +5,34 @@ import SidebarFilters from './components/SidebarFilters';
 import ProductCard from './components/ProductCard';
 import Pagination from './components/Pagination';
 import Modal from './components/Modal';
+import Cart from './components/Cart'; // Importe o Carrinho
+
 // import './App.scss'; // Se estiver usando create-react-app padrão
 
 function App() {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+    const [cartOpen, setCartOpen] = useState(false); // NOVO STATE DO CARRINHO
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const itemsPerPage = 12;
 
+    // ... (Mantenha sua lógica de produtos aqui como estava) ...
+    const itemsPerPage = 12;
     const allProducts = Array.from({ length: 204 }).map((_, index) => {
         const price = (Math.random() * (350 - 150) + 150);
-        const oldPrice = price * 1.2; // Simula preço original mais caro
-        
         return {
             id: index + 1,
-            name: `Camisa Oficial Edição ${index + 1} - Temporada 2024/25`, // Nome mais longo estilo e-commerce
+            name: `Camisa Oficial Edição ${index + 1} - Temporada 2024/25`,
             price: price.toFixed(2),
-            oldPrice: oldPrice.toFixed(2),
+            oldPrice: (price * 1.2).toFixed(2),
             type: index % 2 === 0 ? 'Nacional' : 'Internacional',
             isOffer: index % 5 === 0,
-            rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1), // Avaliação 3.5 a 5.0
+            rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
             reviews: Math.floor(Math.random() * 500),
-            description: 'Produto oficial com tecnologia de respiração Dri-Fit. Ideal para torcedores e prática de esportes. Garantia de fábrica e selo de autenticidade incluso.',
+            description: 'Produto oficial com tecnologia de respiração Dri-Fit.',
             sizes: ['P', 'M', 'G', 'GG', 'XG'],
             colors: ['Vermelho', 'Preto', 'Branco'],
             images: [
-                `https://placehold.co/600x600/f5f5f5/333?text=Frente-${index + 1}`,
-                `https://placehold.co/600x600/f5f5f5/333?text=Costas-${index + 1}`,
-                `https://placehold.co/600x600/f5f5f5/333?text=Detalhe-${index + 1}`,
-                `https://placehold.co/600x600/f5f5f5/333?text=Uso-${index + 1}`
+                `https://placehold.co/600x600/f5f5f5/333?text=Frente-${index + 1}`
             ]
         };
     });
@@ -58,18 +57,17 @@ function App() {
 
     return (
         <div className="App">
-            <Header />
+            {/* Passando a função para abrir o carrinho */}
+            <Header onOpenCart={() => setCartOpen(true)} />
 
             <div className="main-container">
                 <button className="mobile-filter-btn" onClick={() => setMobileFilterOpen(true)}>
                     <FaFilter /> Filtros
                 </button>
-
                 <SidebarFilters 
                     mobileFilterOpen={mobileFilterOpen} 
                     setMobileFilterOpen={setMobileFilterOpen} 
                 />
-
                 <main className="content-area">
                     <div className="product-grid">
                         {currentItems.map((product) => (
@@ -80,7 +78,6 @@ function App() {
                             />
                         ))}
                     </div>
-
                     <Pagination 
                         currentPage={currentPage} 
                         totalPages={totalPages} 
@@ -89,9 +86,13 @@ function App() {
                 </main>
             </div>
 
+            {/* Modais */}
             {selectedProduct && (
                 <Modal selectedProduct={selectedProduct} closeModal={closeModal} />
             )}
+
+            {/* Componente do Carrinho */}
+            <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </div>
     );
 }
