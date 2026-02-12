@@ -108,7 +108,7 @@
             justify-content: space-between;
             align-items: flex-start;
             
-            h3 {
+h3 {
                 font-size: 0.9rem;
                 color: $preto;
                 font-weight: 600;
@@ -119,6 +119,7 @@
                 // Limita a 2 linhas e põe reticências (...)
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
+                line-clamp: 2; // Adicionada a propriedade padrão para remover o aviso
                 -webkit-box-orient: vertical;
                 overflow: hidden;
             }

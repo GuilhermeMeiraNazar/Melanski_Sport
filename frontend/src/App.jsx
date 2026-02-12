@@ -1,99 +1,31 @@
-import React, { useState } from 'react';
-import { FaFilter } from 'react-icons/fa';
+import React, { useState } from 'react'; // Importante ter o useState
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
-import SidebarFilters from './components/SidebarFilters';
-import ProductCard from './components/ProductCard';
-import Pagination from './components/Pagination';
-import Modal from './components/Modal';
-import Cart from './components/Cart'; // Importe o Carrinho
-
-// import './App.scss'; // Se estiver usando create-react-app padrão
+import Cart from './components/Cart';
+import Home from './pages/client/Home';
+import Admin from './pages/admin/Admin';
 
 function App() {
-    const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-    const [cartOpen, setCartOpen] = useState(false); // NOVO STATE DO CARRINHO
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-
-    // ... (Mantenha sua lógica de produtos aqui como estava) ...
-    const itemsPerPage = 12;
-    const allProducts = Array.from({ length: 204 }).map((_, index) => {
-        const price = (Math.random() * (350 - 150) + 150);
-        return {
-            id: index + 1,
-            name: `Camisa Oficial Edição ${index + 1} - Temporada 2024/25`,
-            price: price.toFixed(2),
-            oldPrice: (price * 1.2).toFixed(2),
-            type: index % 2 === 0 ? 'Nacional' : 'Internacional',
-            isOffer: index % 5 === 0,
-            rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
-            reviews: Math.floor(Math.random() * 500),
-            description: 'Produto oficial com tecnologia de respiração Dri-Fit.',
-            sizes: ['P', 'M', 'G', 'GG', 'XG'],
-            colors: ['Vermelho', 'Preto', 'Branco'],
-            images: [
-                `https://placehold.co/600x600/f5f5f5/333?text=Frente-${index + 1}`
-            ]
-        };
-    });
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = allProducts.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(allProducts.length / itemsPerPage);
-
-    const paginate = (pageNumber) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleProductClick = (product) => {
-        setSelectedProduct(product);
-    };
-
-    const closeModal = () => {
-        setSelectedProduct(null);
-    };
+    const [cartOpen, setCartOpen] = useState(false);
 
     return (
-        <div className="App">
-            {/* Passando a função para abrir o carrinho */}
-            <Header onOpenCart={() => setCartOpen(true)} />
+        <Router basename="/Melanski_Sport">
+            <Routes>
+                <Route path="/" element={
+                    <>
+                        {/* Agora passamos a função que muda o estado para TRUE */}
+                        <Header onOpenCart={() => setCartOpen(true)} /> 
+                        
+                        <Home />
 
-            <div className="main-container">
-                <button className="mobile-filter-btn" onClick={() => setMobileFilterOpen(true)}>
-                    <FaFilter /> Filtros
-                </button>
-                <SidebarFilters 
-                    mobileFilterOpen={mobileFilterOpen} 
-                    setMobileFilterOpen={setMobileFilterOpen} 
-                />
-                <main className="content-area">
-                    <div className="product-grid">
-                        {currentItems.map((product) => (
-                            <ProductCard 
-                                key={product.id} 
-                                product={product} 
-                                handleProductClick={handleProductClick} 
-                            />
-                        ))}
-                    </div>
-                    <Pagination 
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        paginate={paginate} 
-                    />
-                </main>
-            </div>
+                        {/* Adicionamos o Componente Cart aqui e passamos o estado e a função de fechar */}
+                        <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+                    </>
+                } />
 
-            {/* Modais */}
-            {selectedProduct && (
-                <Modal selectedProduct={selectedProduct} closeModal={closeModal} />
-            )}
-
-            {/* Componente do Carrinho */}
-            <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-        </div>
+                <Route path="/admin" element={<Admin />} />
+            </Routes>
+        </Router>
     );
 }
 
