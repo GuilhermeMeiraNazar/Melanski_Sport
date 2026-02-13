@@ -1,5 +1,4 @@
 /* _modal.scss */
-
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -83,6 +82,7 @@
         gap: 10px;
         justify-content: center;
         flex-wrap: wrap;
+
         .thumb-item {
             width: 60px;
             height: 60px;
@@ -91,12 +91,14 @@
             cursor: pointer;
             padding: 2px;
             transition: all 0.2s;
+
             img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
                 border-radius: 4px;
             }
+
             &:hover, &.active {
                 border-color: $vermelho-principal;
             }
@@ -223,11 +225,17 @@
             transition: opacity 0.2s, background-color 0.2s;
         }
         
+        /* ESTILO ATUALIZADO PARA WHATSAPP */
         .btn-buy-now { 
-            background-color: $preto; 
+            background-color: #25D366; 
             color: $branco; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
             
-            &:hover { background-color: $vermelho-principal; }
+            &:hover { background-color: #1ebe57; }
         }
         
         .btn-add-cart { 

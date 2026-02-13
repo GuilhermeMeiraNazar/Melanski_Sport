@@ -1,11 +1,21 @@
 /* _header.scss */
+// Variáveis (exemplo, ajuste conforme seu variables.scss)
+$preto: #000;
+$branco: #fff;
+$vermelho-principal: #dc143c;
+
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .header-container {
     width: 100%;
-    position: fixed;
+    position: fixed; // Garante que fica preso no topo
     top: 0;
     left: 0;
-    z-index: 5000;
+    z-index: 5000; // Alto z-index para ficar sobre tudo
     background-color: $preto;
 
     .top-bar {
@@ -65,21 +75,28 @@
                 .cart-icon {
                     position: relative;
                     font-size: 1.56rem;
-                    cursor: pointer;
+                    cursor: pointer; // Importante para clicar
+                    transition: transform 0.2s;
+
+                    &:hover {
+                        transform: scale(1.1);
+                    }
 
                     .cart-count {
-                        @include flex-center;
+                        position: absolute;
                         top: -8px;
                         right: -10px;
                         background-color: $vermelho-principal;
-                        width: 16px;
-                        height: 16px;
+                        width: 18px; // Levemente maior para caber números > 9
+                        height: 18px;
                         border-radius: 50%;
-                        font-size: 0.6rem;
+                        font-size: 0.65rem;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         font-weight: 900;
+                        color: $branco;
+                        border: 2px solid $preto; // Borda para separar do ícone
                     }
                 }
             }

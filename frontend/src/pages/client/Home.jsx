@@ -6,7 +6,7 @@ import ProductCard from '../../components/ProductCard';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 
-function Home({ onOpenCart }) { // Recebe a função de abrir carrinho se precisar
+function Home({ onOpenCart, addToCart }) { // Adicionada a prop addToCart que vem do App.js
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -72,9 +72,13 @@ function Home({ onOpenCart }) { // Recebe a função de abrir carrinho se precis
                 />
             </main>
 
-            {/* Modal fica aqui pois pertence à visualização dos produtos */}
+            {/* Modal agora recebe a prop addToCart para poder enviar o item ao carrinho */}
             {selectedProduct && (
-                <Modal selectedProduct={selectedProduct} closeModal={closeModal} />
+                <Modal 
+                    selectedProduct={selectedProduct} 
+                    closeModal={closeModal} 
+                    addToCart={addToCart} 
+                />
             )}
         </div>
     );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaUserAlt, FaShoppingCart } from 'react-icons/fa';
 
-function Header({ onOpenCart }) { // Recebe a prop onOpenCart
+function Header({ onOpenCart, cartCount }) {
     return (
         <header className="header-container">
             <div className="top-bar">
@@ -16,10 +16,12 @@ function Header({ onOpenCart }) { // Recebe a prop onOpenCart
                         <h1>Melanski<span>Sports</span></h1>
                     </div>
                     <div className="header-icons">
-                        {/* Adicionado o onClick aqui */}
-                        <div className="cart-icon" onClick={onOpenCart} style={{cursor: 'pointer'}}>
+                        <div className="cart-icon" onClick={onOpenCart}>
                             <FaShoppingCart />
-                            <span className="cart-count">2</span>
+                            {/* Só exibe a bolinha se tiver itens */}
+                            {cartCount > 0 && (
+                                <span className="cart-count">{cartCount}</span>
+                            )}
                         </div>
                     </div>
                 </div>

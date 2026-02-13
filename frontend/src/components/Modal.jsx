@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
 
 function Modal({ selectedProduct, closeModal, addToCart }) {
     const [activeImgIndex, setActiveImgIndex] = useState(0);
@@ -89,9 +89,11 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                         </div>
 
                         <div className="action-buttons">
-                            <button className="btn-buy-now">Comprar agora</button>
+                            {/* BOTÃO ALTERADO PARA ESTILO WHATSAPP */}
+                            <button className="btn-buy-now">
+                                <FaWhatsapp size={20} /> Comprar no WhatsApp
+                            </button>
                             
-                            {/* BOTÃO ALTERADO AQUI */}
                             <button className="btn-add-cart" onClick={onAddClick}>
                                 <FaShoppingCart /> Adicionar ao carrinho
                             </button>

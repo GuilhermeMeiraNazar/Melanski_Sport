@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaTrash, FaWhatsapp } from 'react-icons/fa';
 
-// Dados de exemplo
-const cartItemsMock = [
+// Dados de exemplo iniciais
+const initialCartItems = [
     {
         id: 1,
         name: "Camisa Oficial Edição 1 - Temporada 2024/25",
@@ -22,8 +22,17 @@ const cartItemsMock = [
 ];
 
 const Cart = ({ isOpen, onClose }) => {
-    // Cálculo simples do total
-    const total = cartItemsMock.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    // Estado para armazenar os itens do carrinho
+    const [cartItems, setCartItems] = useState(initialCartItems);
+
+    // Cálculo do total baseado no estado atual
+    const total = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    // Função para remover item
+    const removeItem = (id) => {
+        const updatedItems = cartItems.filter(item => item.id !== id);
+        setCartItems(updatedItems);
+    };
 
     if (!isOpen) return null;
 
@@ -38,37 +47,42 @@ const Cart = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="cart-items-wrapper">
-                    {cartItemsMock.map((item) => (
-                        <div className="cart-item-card" key={item.id}>
-                            <div className="item-img">
-                                <img src={item.image} alt={item.name} />
-                            </div>
-                            
-                            <div className="item-info">
-                                <div className="item-top">
-                                    <h3>{item.name}</h3>
-                                    <button className="remove-btn">
-                                        <FaTrash />
-                                    </button>
+                    {cartItems.length === 0 ? (
+                        <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>Seu carrinho está vazio.</p>
+                    ) : (
+                        cartItems.map((item) => (
+                            <div className="cart-item-card" key={item.id}>
+                                <div className="item-img">
+                                    <img src={item.image} alt={item.name} />
                                 </div>
                                 
-                                <div className="item-details">
-                                    Tam: {item.size}
-                                </div>
-
-                                <div className="item-bottom">
-                                    <div className="qty-control">
-                                        <button>-</button>
-                                        <span>{item.quantity}</span>
-                                        <button>+</button>
+                                <div className="item-info">
+                                    <div className="item-top">
+                                        <h3>{item.name}</h3>
+                                        {/* Botão de Excluir com ação conectada */}
+                                        <button className="remove-btn" onClick={() => removeItem(item.id)}>
+                                            <FaTrash />
+                                        </button>
                                     </div>
-                                    <div className="price">
-                                        R$ {item.price.toFixed(2).replace('.', ',')}
+                                    
+                                    <div className="item-details">
+                                        Tam: {item.size}
+                                    </div>
+
+                                    <div className="item-bottom">
+                                        <div className="qty-control">
+                                            <button>-</button>
+                                            <span>{item.quantity}</span>
+                                            <button>+</button>
+                                        </div>
+                                        <div className="price">
+                                            R$ {item.price.toFixed(2).replace('.', ',')}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
 
                 <div className="cart-footer">
