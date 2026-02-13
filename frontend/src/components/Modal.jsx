@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
 
+// --- CONFIGURAÇÃO ---
+// Substitua pelo número real da loja (apenas números, com código do país e DDD)
+const PHONE_NUMBER = '5511999999999'; 
+
 function Modal({ selectedProduct, closeModal, addToCart }) {
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState(null);
@@ -11,17 +15,40 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
     const sizes = selectedProduct.sizes || [];
     const discount = Math.round(((selectedProduct.oldPrice - selectedProduct.price) / selectedProduct.oldPrice) * 100);
 
-    // Função interna para validar e chamar a prop do pai
+    // Função para comprar direto no WhatsApp
+    const handleBuyWhatsapp = () => {
+        // Validação de tamanho (se o produto tiver tamanhos)
+        if (sizes.length > 0 && !selectedSize) {
+            alert("Por favor, selecione um tamanho antes de ir para o WhatsApp.");
+            return;
+        }
+
+        // Formatação da mensagem
+        let message = `Olá! Gostaria de comprar este item que vi no site:\n\n`;
+        message += `*Produto:* ${selectedProduct.name}\n`;
+        
+        // Só adiciona linha de tamanho se tiver tamanho selecionado
+        if (selectedSize) {
+            message += `*Tamanho:* ${selectedSize}\n`;
+        }
+        
+        message += `*Preço:* R$ ${selectedProduct.price}\n`;
+        message += `\nAguardo confirmação de disponibilidade!`;
+
+        // Codifica a mensagem para URL e abre
+        const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    };
+
+    // Função interna para adicionar ao carrinho
     const onAddClick = () => {
-        if (!selectedSize) {
+        if (sizes.length > 0 && !selectedSize) {
             alert("Por favor, selecione um tamanho antes de adicionar.");
             return;
         }
-        
-        // 1. Adiciona ao carrinho
+        // Chama a função passada pelo App.jsx
         addToCart(selectedProduct, selectedSize);
-        
-        // 2. Fecha o modal automaticamente (Nova funcionalidade)
+        // Fecha o modal
         closeModal();
     };
 
@@ -93,8 +120,8 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                         </div>
 
                         <div className="action-buttons">
-                            {/* BOTÃO ALTERADO PARA ESTILO WHATSAPP */}
-                            <button className="btn-buy-now">
+                            {/* BOTÃO WHATSAPP CONECTADO */}
+                            <button className="btn-buy-now" onClick={handleBuyWhatsapp}>
                                 <FaWhatsapp size={20} /> Comprar no WhatsApp
                             </button>
                             
