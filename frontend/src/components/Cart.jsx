@@ -1,44 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaTrash, FaWhatsapp } from 'react-icons/fa';
 
-// Dados de exemplo iniciais
-const initialCartItems = [
-    {
-        id: 1,
-        name: "Camisa Oficial Edição 1 - Temporada 2024/25",
-        size: "M",
-        price: 224.36,
-        quantity: 1,
-        image: "https://placehold.co/150x150/f5f5f5/333?text=Frente-1"
-    },
-    {
-        id: 2,
-        name: "Camisa Oficial Edição 2 - Temporada 2024/25",
-        size: "G",
-        price: 198.30,
-        quantity: 2,
-        image: "https://placehold.co/150x150/f5f5f5/333?text=Frente-2"
-    }
-];
-
-const Cart = ({ isOpen, onClose }) => {
-    // Estado para armazenar os itens do carrinho
-    const [cartItems, setCartItems] = useState(initialCartItems);
-
-    // Cálculo do total baseado no estado atual
-    const total = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
-    // Função para remover item
-    const removeItem = (id) => {
-        const updatedItems = cartItems.filter(item => item.id !== id);
-        setCartItems(updatedItems);
-    };
+const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
+    
+    // Cálculo do total
+    const total = cartItems.reduce((acc, item) => acc + (Number(item.price) * item.quantity), 0);
 
     if (!isOpen) return null;
 
     return (
         <div className="cart-overlay" onClick={onClose}>
-            {/* O stopPropagation impede que o clique no carrinho feche ele mesmo */}
             <div className="cart-sidebar" onClick={(e) => e.stopPropagation()}>
                 
                 <div className="cart-header">
@@ -53,20 +24,23 @@ const Cart = ({ isOpen, onClose }) => {
                         cartItems.map((item) => (
                             <div className="cart-item-card" key={item.id}>
                                 <div className="item-img">
-                                    <img src={item.image} alt={item.name} />
+                                    <img 
+                                        src={item.images && item.images.length > 0 ? item.images[0] : "https://placehold.co/150"} 
+                                        alt={item.name} 
+                                    />
                                 </div>
                                 
                                 <div className="item-info">
                                     <div className="item-top">
                                         <h3>{item.name}</h3>
-                                        {/* Botão de Excluir com ação conectada */}
+                                        {/* Ação de excluir conectada ao ID correto */}
                                         <button className="remove-btn" onClick={() => removeItem(item.id)}>
                                             <FaTrash />
                                         </button>
                                     </div>
                                     
                                     <div className="item-details">
-                                        Tam: {item.size}
+                                        Tam: {item.selectedSize}
                                     </div>
 
                                     <div className="item-bottom">
@@ -76,7 +50,7 @@ const Cart = ({ isOpen, onClose }) => {
                                             <button>+</button>
                                         </div>
                                         <div className="price">
-                                            R$ {item.price.toFixed(2).replace('.', ',')}
+                                            R$ {Number(item.price).toFixed(2).replace('.', ',')}
                                         </div>
                                     </div>
                                 </div>

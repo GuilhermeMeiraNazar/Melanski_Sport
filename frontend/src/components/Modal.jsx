@@ -17,8 +17,12 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
             alert("Por favor, selecione um tamanho antes de adicionar.");
             return;
         }
-        // Chama a função passada pelo App.jsx
+        
+        // 1. Adiciona ao carrinho
         addToCart(selectedProduct, selectedSize);
+        
+        // 2. Fecha o modal automaticamente (Nova funcionalidade)
+        closeModal();
     };
 
     return (
@@ -77,8 +81,8 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                             <label>Tamanho: <span style={{fontWeight: 'normal', color: selectedSize ? '#dc143c' : '#999'}}>{selectedSize || 'Selecione'}</span></label>
                             <div className="size-selector">
                                 {sizes.map(size => (
-                                    <button 
-                                        key={size} 
+                                    <button
+                                        key={size}
                                         className={`size-opt ${selectedSize === size ? 'selected' : ''}`}
                                         onClick={() => setSelectedSize(size)}
                                     >

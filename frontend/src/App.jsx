@@ -8,12 +8,12 @@ import Admin from './pages/admin/Admin';
 
 function App() {
     const [cartOpen, setCartOpen] = useState(false);
-    const [cartItems, setCartItems] = useState([]); // 1. Estado para guardar os itens
+    const [cartItems, setCartItems] = useState([]); 
 
-    // 2. Função para adicionar item (será passada para a Home -> Modal)
+    // Adicionar item (Melhorado com ID único mais seguro)
     const addToCart = (product, size) => {
         const newItem = {
-            id: Date.now(), // ID único
+            id: Date.now() + Math.random(), // Evita bugs de ID duplicado em cliques rápidos
             ...product,
             selectedSize: size,
             quantity: 1
@@ -21,7 +21,7 @@ function App() {
         setCartItems([...cartItems, newItem]);
     };
 
-    // 3. Função para remover item (será passada para o Cart)
+    // Remover item
     const removeFromCart = (itemId) => {
         const updatedList = cartItems.filter(item => item.id !== itemId);
         setCartItems(updatedList);
@@ -32,25 +32,22 @@ function App() {
             <Routes>
                 <Route path="/" element={
                     <>
-                        {/* Header recebe a quantidade real de itens */}
                         <Header 
                             onOpenCart={() => setCartOpen(true)} 
                             cartCount={cartItems.length} 
                         /> 
                         
-                        {/* Home recebe a função de adicionar para passar ao Modal */}
                         <Home addToCart={addToCart} />
 
-                        {/* Cart recebe a lista de itens, estado de abrir/fechar e função de remover */}
+                        {/* AQUI ESTAVA O SEGREDO: Passando a função removeItem */}
                         <Cart 
                             isOpen={cartOpen} 
                             onClose={() => setCartOpen(false)} 
                             cartItems={cartItems}
-                            removeItem={removeFromCart}
+                            removeItem={removeFromCart} 
                         />
                     </>
                 } />
-
                 <Route path="/admin" element={<Admin />} />
             </Routes>
         </Router>
