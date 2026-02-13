@@ -21,6 +21,7 @@
         max-width: 400px;
         box-shadow: $shadow-suave;
         text-align: center;
+        margin: 0 15px; // Margem de segurança no mobile
 
         h2 {
             margin-bottom: 20px;
@@ -140,12 +141,12 @@
             font-size: 0.95rem;
             color: $preto;
 
-            .prod-thumb {
-                width: 50px;
-                height: 50px;
+            .badge {
                 background: #eee;
+                padding: 4px 8px;
                 border-radius: 4px;
-                object-fit: cover;
+                font-size: 0.8rem;
+                font-weight: bold;
             }
 
             .actions-cell {
@@ -177,6 +178,11 @@
     margin: 0 auto;
 
     h2 { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
 
     .form-group {
         margin-bottom: 20px;
@@ -220,16 +226,16 @@
     /* Área específica de tamanhos (Roupas) */
     .sizes-input-wrapper {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 10px;
         background: #f9f9f9;
         padding: 15px;
         border-radius: 8px;
 
         .size-slot {
             text-align: center;
-            label { font-size: 0.8rem; margin-bottom: 5px; color: #666; }
-            input { text-align: center; padding: 8px; }
+            label { font-size: 0.8rem; margin-bottom: 5px; color: #666; display: block;}
+            input { text-align: center; padding: 8px; width: 100%; }
         }
     }
 
@@ -247,6 +253,83 @@
 
             &.btn-save { background: $preto; color: $branco; &:hover { background: $vermelho-principal; } }
             &.btn-cancel { background: #eee; color: #333; &:hover { background: #ddd; } }
+        }
+    }
+}
+
+/* --- RESPONSIVIDADE ESPECÍFICA DO ADMIN --- */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        text-align: center;
+        
+        .admin-actions {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .admin-form-container {
+        padding: 20px;
+        
+        .form-row, .discount-inputs {
+            flex-direction: column !important;
+            gap: 0 !important;
+        }
+        
+        .sizes-input-wrapper {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+
+    /* Transformação da Tabela em Cards Profissionais */
+    .product-list-table {
+        display: block;
+        
+        thead { display: none; } /* Esconde cabeçalho */
+        
+        tbody, tr, td { display: block; width: 100%; }
+        
+        tr {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: $branco;
+            padding: 10px;
+        }
+        
+        td {
+            text-align: right;
+            padding: 10px;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            
+            &:last-child { border-bottom: none; }
+            
+            /* Usa o atributo data-label para criar o título à esquerda */
+            &::before {
+                content: attr(data-label);
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                color: #888;
+                text-align: left;
+            }
+            
+            &.actions-cell {
+                justify-content: flex-end;
+                padding-top: 15px;
+            }
         }
     }
 }

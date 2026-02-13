@@ -5,10 +5,21 @@
     padding: 0;
     box-sizing: border-box;
     font-family: $font-primary;
+    -webkit-tap-highlight-color: transparent; // Remove o flash azul ao clicar no mobile
+}
+
+html {
+    font-size: 100%; // Base para os REMs funcionarem (16px padrão)
 }
 
 body {
     background-color: $background-body;
     color: $text-color;
     overflow-x: hidden;
+    line-height: 1.6;
+}
+
+// Melhoria de usabilidade em botões
+button {
+    font-family: inherit;
 }

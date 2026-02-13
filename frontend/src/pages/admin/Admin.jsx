@@ -119,11 +119,12 @@ const ProductList = ({ products, onEdit, onDelete }) => {
             <tbody>
                 {products.map(p => (
                     <tr key={p.id}>
-                        <td>{p.name}</td>
-                        <td><span className="badge">{p.category}</span></td>
-                        <td>R$ {parseFloat(p.price).toFixed(2)}</td>
-                        <td>{formatStock(p.stock, p.category)}</td>
-                        <td className="actions-cell">
+                        {/* Adicionei data-label para responsividade CSS */}
+                        <td data-label="Nome">{p.name}</td>
+                        <td data-label="Categoria"><span className="badge">{p.category}</span></td>
+                        <td data-label="Preço">R$ {parseFloat(p.price).toFixed(2)}</td>
+                        <td data-label="Estoque">{formatStock(p.stock, p.category)}</td>
+                        <td data-label="Ações" className="actions-cell">
                             <button className="edit-btn" onClick={() => onEdit(p)}><FaEdit /></button>
                             <button className="delete-btn" onClick={() => onDelete(p.id)}><FaTrash /></button>
                         </td>
@@ -152,14 +153,14 @@ const CategorySelector = ({ onSelect, onCancel }) => {
     );
 };
 
-// --- COMPONENTE FORMULÁRIO (A LÓGICA QUE VOCÊ QUERIA) ---
+// --- COMPONENTE FORMULÁRIO ---
 const ProductForm = ({ category, initialData, onSave, onCancel }) => {
     const [name, setName] = useState(initialData?.name || '');
     const [description, setDescription] = useState(initialData?.description || '');
     
     // Novos campos de Preço
-    const [costPrice, setCostPrice] = useState(initialData?.costPrice || ''); // Preço que pagou
-    const [salePrice, setSalePrice] = useState(initialData?.salePrice || ''); // Preço que vende
+    const [costPrice, setCostPrice] = useState(initialData?.costPrice || ''); 
+    const [salePrice, setSalePrice] = useState(initialData?.salePrice || ''); 
     
     // Lógica de Desconto
     const [hasDiscount, setHasDiscount] = useState(initialData?.hasDiscount || false);
@@ -184,7 +185,7 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
             salePrice: parseFloat(salePrice),
             hasDiscount,
             discountPercentage: parseFloat(discountPercentage),
-            price: parseFloat(finalPrice), // O preço que vai para a vitrine
+            price: parseFloat(finalPrice), 
             stock: category === 'Roupa' ? sizesQty : parseInt(simpleQty)
         });
     };
@@ -202,7 +203,7 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                     <input value={name} onChange={e => setName(e.target.value)} required />
                 </div>
 
-                <div className="form-row" style={{display:'flex', gap:'15px'}}>
+                <div className="form-row">
                     <div className="form-group" style={{flex:1}}>
                         <label>Custo (O que você pagou)</label>
                         <input type="number" step="0.01" value={costPrice} onChange={e => setCostPrice(e.target.value)} required placeholder="R$ 0,00" />
@@ -214,22 +215,22 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                 </div>
 
                 <div className="discount-section" style={{background:'#f9f9f9', padding:'15px', borderRadius:'8px', marginBottom:'15px', border:'1px solid #eee'}}>
-                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                        <label style={{fontWeight:'bold', cursor:'pointer'}}>
-                            <input type="checkbox" checked={hasDiscount} onChange={e => setHasDiscount(e.target.checked)} style={{marginRight:'10px'}} />
+                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap: 'wrap'}}>
+                        <label style={{fontWeight:'bold', cursor:'pointer', display: 'flex', alignItems: 'center'}}>
+                            <input type="checkbox" checked={hasDiscount} onChange={e => setHasDiscount(e.target.checked)} style={{marginRight:'10px', width: 'auto'}} />
                             Aplicar Desconto Promocional?
                         </label>
                         {hasDiscount && <span style={{color:'#27ae60', fontWeight:'bold'}}>- {discountPercentage}%</span>}
                     </div>
 
                     {hasDiscount && (
-                        <div style={{marginTop:'15px', display:'flex', alignItems:'center', gap:'15px'}}>
+                        <div className="discount-inputs" style={{marginTop:'15px', display:'flex', alignItems:'center', gap:'15px'}}>
                             <div style={{flex:1}}>
-                                <label>Porcentagem de Desconto (%)</label>
+                                <label>Porcentagem (%)</label>
                                 <input type="number" value={discountPercentage} onChange={e => setDiscountPercentage(e.target.value)} min="0" max="100" />
                             </div>
                             <div style={{flex:1}}>
-                                <label>Preço Final na Vitrine</label>
+                                <label>Preço Vitrine</label>
                                 <div style={{padding:'10px', background:'#fff', border:'1px solid #ddd', borderRadius:'4px', fontWeight:'bold', color:'#e74c3c'}}>
                                     R$ {finalPrice}
                                 </div>
@@ -238,11 +239,10 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                     )}
                 </div>
 
-                {/* --- MANTÉM A LÓGICA DE ESTOQUE DE ROUPAS ABAIXO --- */}
                 {category === 'Roupa' ? (
                     <div className="form-group">
                         <label>Estoque por Tamanho</label>
-                        <div className="sizes-input-wrapper" style={{display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:'5px'}}>
+                        <div className="sizes-input-wrapper">
                             {Object.keys(sizesQty).map(size => (
                                 <div key={size} className="size-slot">
                                     <label>{size}</label>
@@ -259,7 +259,7 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                     </div>
                 )}
 
-                <div className="form-actions" style={{display:'flex', gap:'10px', marginTop:'20px'}}>
+                <div className="form-actions">
                     <button type="submit" className="btn-save">Salvar Produto</button>
                     <button type="button" className="btn-cancel" onClick={onCancel}>Cancelar</button>
                 </div>
