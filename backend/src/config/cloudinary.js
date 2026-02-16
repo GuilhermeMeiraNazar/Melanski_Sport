@@ -1,11 +1,11 @@
-require('dotenv').config(); // Carrega as variáveis do .env
+require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 
-// Configuração da conexão
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
 });
 
 module.exports = cloudinary;

@@ -1,56 +1,37 @@
 const cloudinary = require('../config/cloudinary');
 
 /**
- * Faz upload de uma imagem para o Cloudinary com redimensionamento automático.
- * @param {string} imagePath - Caminho do arquivo local ou URL da imagem.
- * @returns {Promise<string>} - Retorna a URL segura (https) da imagem.
+ * Faz upload de uma imagem para o Cloudinary com redimensionamento e otimização.
+ * Recebe a string Base64 enviada pelo Front-end.
  */
-const uploadImage = async (imagePath) => {
+const uploadImage = async (base64String) => {
     try {
-        // Pega as dimensões definidas no .env
-        const width = process.env.IMAGE_WIDTH || 400; // Valor padrão caso .env falhe
-        const height = process.env.IMAGE_HEIGHT || 300;
+        // Pega as dimensões do .env ou usa o padrão 800x1000
+        const width = parseInt(process.env.IMAGE_WIDTH) || 800;
+        const height = parseInt(process.env.IMAGE_HEIGHT) || 1000;
 
-        const result = await cloudinary.uploader.upload(imagePath, {
-            folder: "loja_camisas", // Pasta organizada dentro do Cloudinary
-            
-            // --- AQUI ESTÁ A LÓGICA DE REDIMENSIONAMENTO ---
+        const result = await cloudinary.uploader.upload(base64String, {
+            folder: "loja_camisas",
             transformation: [
                 {
                     width: width,
                     height: height,
-                    crop: "fill",    // Corta o excesso para caber no tamanho exato
-                    gravity: "auto"  // IA: Tenta manter o objeto principal no centro
+                    crop: "fill",
+                    gravity: "auto"
                 },
                 {
-                    fetch_format: "auto", // Converte para WebP/AVIF automaticamente
-                    quality: "auto"       // Otimiza o peso do arquivo
+                    fetch_format: "auto",
+                    quality: "auto"
                 }
             ]
         });
 
-        return result.secure_url; // Retorna apenas o link: https://...
-
+        // Retorna a URL segura gerada pelo Cloudinary
+        return result.secure_url; 
     } catch (error) {
         console.error("Erro no upload para o Cloudinary:", error);
-        throw error; // Lança o erro para o Controller tratar
+        throw error;
     }
 };
 
 module.exports = { uploadImage };
-
-//Como usar essa funcao 
-
-// const uploadService = require('../services/uploadService');
-
-// // Dentro da sua rota de criação de produto:
-// try {
-//     // Supondo que você recebeu o arquivo e ele está em 'req.file.path'
-//     const imageUrl = await uploadService.uploadImage(req.file.path);
-    
-//     console.log("Link gerado:", imageUrl);
-//     // Agora salve 'imageUrl' no seu banco de dados MySQL...
-    
-// } catch (error) {
-//     res.status(500).send("Erro ao salvar imagem");
-// }
