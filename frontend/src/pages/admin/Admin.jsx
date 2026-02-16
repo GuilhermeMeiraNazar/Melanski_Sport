@@ -1,42 +1,38 @@
-import React, { useState } from 'react';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaArrowLeft, FaBoxOpen, FaTimes, FaCamera } from 'react-icons/fa';
-
-const initialProducts = [
-    { 
-        id: 1, 
-        name: "Camisa Tailandesa 1", 
-        category: "Roupa", 
-        price: 150.00, 
-        stock: { P: 2, M: 5, G: 0, GG: 0, XG: 0 }, 
-        description: "Camisa top.",
-        origin: "Internacional",
-        gender: "Masculino",
-        team: "Flamengo",
-        images: [] 
-    },
-    { 
-        id: 2, 
-        name: "Copo Térmico", 
-        category: "Copo", 
-        price: 80.00, 
-        stock: 20, 
-        description: "Mantém gelado.",
-        origin: "Nacional",
-        gender: "",
-        team: "",
-        images: []
-    },
-];
+import React, { useState, useEffect } from 'react';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaArrowLeft, FaBoxOpen, FaTimes } from 'react-icons/fa';
+import { productSvc } from '../../services/api'; // Importando a API
 
 const Admin = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [products, setProducts] = useState(initialProducts);
+    const [products, setProducts] = useState([]); // Inicia vazio para carregar do banco
+    const [loading, setLoading] = useState(false);
+    
     const [currentView, setCurrentView] = useState('list'); 
     const [editingProduct, setEditingProduct] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('');
 
     const [loginUser, setLoginUser] = useState('');
     const [loginPass, setLoginPass] = useState('');
+
+    // --- CARREGAR DADOS DO BANCO ---
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchProducts();
+        }
+    }, [isAuthenticated]);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await productSvc.list();
+            setProducts(response.data);
+        } catch (error) {
+            console.error("Erro ao buscar produtos:", error);
+            alert("Erro ao carregar produtos do sistema.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -50,14 +46,43 @@ const Admin = () => {
         setCurrentView('list');
     };
 
-    const handleSaveProduct = (formData) => {
-        if (editingProduct) {
-            setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...formData } : p));
-        } else {
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            setProducts([...products, { id: newId, ...formData }]);
+    // --- SALVAR NO BANCO DE DADOS (CREATE / UPDATE) ---
+    const handleSaveProduct = async (formData) => {
+        try {
+            setLoading(true);
+            if (editingProduct) {
+                // Atualizar
+                await productSvc.update(editingProduct.id, formData);
+                alert("Produto atualizado com sucesso!");
+            } else {
+                // Criar Novo
+                await productSvc.create(formData);
+                alert("Produto cadastrado com sucesso!");
+            }
+            
+            // Recarrega a lista e volta para a tela inicial
+            await fetchProducts();
+            setCurrentView('list');
+            setEditingProduct(null);
+        } catch (error) {
+            console.error("Erro ao salvar:", error);
+            alert("Ocorreu um erro ao salvar o produto.");
+        } finally {
+            setLoading(false);
         }
-        setCurrentView('list');
+    };
+
+    // --- DELETAR DO BANCO ---
+    const handleDeleteProduct = async (id) => {
+        if (window.confirm("Tem certeza que deseja excluir permanentemente?")) {
+            try {
+                await productSvc.delete(id);
+                setProducts(products.filter(p => p.id !== id));
+            } catch (error) {
+                console.error("Erro ao deletar:", error);
+                alert("Erro ao excluir produto.");
+            }
+        }
     };
 
     if (!isAuthenticated) {
@@ -92,11 +117,13 @@ const Admin = () => {
             </header>
 
             <main className="admin-content">
-                {currentView === 'list' && (
+                {loading && <div style={{padding:'20px', textAlign:'center'}}>Carregando...</div>}
+
+                {!loading && currentView === 'list' && (
                     <ProductList 
                         products={products} 
                         onEdit={(p) => { setEditingProduct(p); setSelectedCategory(p.category); setCurrentView('form'); }} 
-                        onDelete={(id) => window.confirm("Excluir?") && setProducts(products.filter(p => p.id !== id))} 
+                        onDelete={handleDeleteProduct} 
                     />
                 )}
 
@@ -113,6 +140,7 @@ const Admin = () => {
                         initialData={editingProduct}
                         onSave={handleSaveProduct}
                         onCancel={() => setCurrentView('list')}
+                        isLoading={loading}
                     />
                 )}
             </main>
@@ -141,28 +169,32 @@ const ProductList = ({ products, onEdit, onDelete }) => {
                 </tr>
             </thead>
             <tbody>
-                {products.map(p => (
-                    <tr key={p.id}>
-                        <td data-label="Nome">
-                            <span style={{fontWeight:'600'}}>{p.name}</span>
-                        </td>
-                        <td data-label="Categoria"><span className="badge">{p.category}</span></td>
-                        <td data-label="Preço" style={{color:'#27ae60', fontWeight:'bold'}}>
-                            R$ {parseFloat(p.price).toFixed(2)}
-                        </td>
-                        <td data-label="Estoque">{formatStock(p.stock, p.category)}</td>
-                        <td data-label="Ações">
-                            <div className="actions-cell">
-                                <button className="edit-btn" onClick={() => onEdit(p)} title="Editar">
-                                    <FaEdit />
-                                </button>
-                                <button className="delete-btn" onClick={() => onDelete(p.id)} title="Excluir">
-                                    <FaTrash />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
+                {products.length === 0 ? (
+                    <tr><td colSpan="5" style={{textAlign:'center'}}>Nenhum produto encontrado.</td></tr>
+                ) : (
+                    products.map(p => (
+                        <tr key={p.id}>
+                            <td data-label="Nome">
+                                <span style={{fontWeight:'600'}}>{p.name}</span>
+                            </td>
+                            <td data-label="Categoria"><span className="badge">{p.category}</span></td>
+                            <td data-label="Preço" style={{color:'#27ae60', fontWeight:'bold'}}>
+                                R$ {parseFloat(p.price || 0).toFixed(2)}
+                            </td>
+                            <td data-label="Estoque">{formatStock(p.stock, p.category)}</td>
+                            <td data-label="Ações">
+                                <div className="actions-cell">
+                                    <button className="edit-btn" onClick={() => onEdit(p)} title="Editar">
+                                        <FaEdit />
+                                    </button>
+                                    <button className="delete-btn" onClick={() => onDelete(p.id)} title="Excluir">
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))
+                )}
             </tbody>
         </table>
     );
@@ -188,54 +220,55 @@ const CategorySelector = ({ onSelect, onCancel }) => {
 };
 
 // --- COMPONENTE FORMULÁRIO ---
-const ProductForm = ({ category, initialData, onSave, onCancel }) => {
+const ProductForm = ({ category, initialData, onSave, onCancel, isLoading }) => {
     const [name, setName] = useState(initialData?.name || '');
     const [description, setDescription] = useState(initialData?.description || '');
     
-    // Novos campos
+    // Campos
     const [origin, setOrigin] = useState(initialData?.origin || 'Nacional');
     const [gender, setGender] = useState(initialData?.gender || 'Masculino');
     const [team, setTeam] = useState(initialData?.team || '');
     
-    // Imagens (Armazena URL de preview ou Objeto File)
-    // Nota: Para o backend, você precisará iterar sobre isso e enviar os arquivos.
+    // Imagens (Armazena Base64 ou URL)
     const [images, setImages] = useState(initialData?.images || []);
 
-    // Novos campos de Preço
-    const [costPrice, setCostPrice] = useState(initialData?.costPrice || ''); 
-    const [salePrice, setSalePrice] = useState(initialData?.salePrice || ''); 
+    // Campos de Preço
+    const [costPrice, setCostPrice] = useState(initialData?.cost_price || ''); 
+    const [salePrice, setSalePrice] = useState(initialData?.sale_price || ''); 
     
-    // Lógica de Desconto
-    const [hasDiscount, setHasDiscount] = useState(initialData?.hasDiscount || false);
-    const [discountPercentage, setDiscountPercentage] = useState(initialData?.discountPercentage || 0);
+    // Desconto
+    const [hasDiscount, setHasDiscount] = useState(initialData?.has_discount ? true : false);
+    const [discountPercentage, setDiscountPercentage] = useState(initialData?.discount_percentage || 0);
 
     // Estoque
-    const [simpleQty, setSimpleQty] = useState(!initialData || category !== 'Roupa' ? (initialData?.stock || 0) : 0);
-    const [sizesQty, setSizesQty] = useState(category === 'Roupa' ? (initialData?.stock || { P: 0, M: 0, G: 0, GG: 0, XG: 0 }) : {});
+    // Ajuste para ler corretamente o objeto vindo do DB ou iniciar zerado
+    const [simpleQty, setSimpleQty] = useState(
+        (!initialData || category !== 'Roupa') ? (initialData?.stock || 0) : 0
+    );
+    const [sizesQty, setSizesQty] = useState(
+        (category === 'Roupa' && initialData?.stock && typeof initialData.stock === 'object') 
+        ? initialData.stock 
+        : { P: 0, M: 0, G: 0, GG: 0, XG: 0 }
+    );
 
-    // Cálculo do preço final
     const finalPrice = hasDiscount 
         ? (salePrice - (salePrice * (discountPercentage / 100))).toFixed(2) 
         : salePrice;
 
-    // --- LÓGICA DE UPLOAD DE ARQUIVO REAL ---
+    // --- LÓGICA DE UPLOAD DE ARQUIVO (Convertendo para Base64) ---
     const handleFileSelect = (e, index) => {
         const file = e.target.files[0];
         if (file) {
-            // Cria uma URL temporária para mostrar na tela imediatamente
-            const previewUrl = URL.createObjectURL(file);
-            
-            // Atualiza o estado
-            const newImages = [...images];
-            
-            // Aqui você pode salvar um objeto { file: file, preview: previewUrl } 
-            // se precisar do arquivo bruto para o backend depois. 
-            // Por enquanto, salvando a URL de preview para a UI funcionar:
-            newImages[index] = previewUrl; 
-            
-            // Opcional: Remover buracos no array
-            // const cleanImages = newImages.filter(img => img);
-            setImages(newImages);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // O reader.result contém a string Base64 completa
+                const base64String = reader.result;
+                
+                const newImages = [...images];
+                newImages[index] = base64String; 
+                setImages(newImages);
+            };
+            reader.readAsDataURL(file); // Lê o arquivo e dispara o onloadend
         }
     };
 
@@ -246,6 +279,8 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Monta o objeto para enviar ao Backend
         onSave({
             category,
             name,
@@ -253,12 +288,12 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
             origin,
             gender,
             team,
-            images,
+            images, // Array de Strings (Base64 ou URLs antigas)
             costPrice: parseFloat(costPrice),
             salePrice: parseFloat(salePrice),
             hasDiscount,
             discountPercentage: parseFloat(discountPercentage),
-            price: parseFloat(finalPrice), 
+            // price: O backend/banco pode calcular ou salvamos apenas o sale_price
             stock: category === 'Roupa' ? sizesQty : parseInt(simpleQty)
         });
     };
@@ -266,7 +301,7 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
     return (
         <div className="admin-form-container">
             <div className="form-header-actions">
-                <button onClick={onCancel} className="btn-back-circle">
+                <button onClick={onCancel} className="btn-back-circle" disabled={isLoading}>
                     <FaArrowLeft />
                 </button>
                 <h2>{initialData ? 'Editar' : 'Novo'} {category}</h2>
@@ -334,6 +369,7 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                             <option value="Masculino">Masculino</option>
                             <option value="Feminino">Feminino</option>
                             <option value="Infantil">Infantil</option>
+                            <option value="Unissex">Unissex</option>
                         </select>
                     </div>
                 </div>
@@ -412,8 +448,10 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn-save">Salvar Produto</button>
-                    <button type="button" className="btn-cancel" onClick={onCancel}>Cancelar</button>
+                    <button type="submit" className="btn-save" disabled={isLoading}>
+                        {isLoading ? 'Salvando...' : 'Salvar Produto'}
+                    </button>
+                    <button type="button" className="btn-cancel" onClick={onCancel} disabled={isLoading}>Cancelar</button>
                 </div>
             </form>
         </div>
