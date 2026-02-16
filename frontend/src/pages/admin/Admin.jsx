@@ -1,9 +1,31 @@
 import React, { useState } from 'react';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaArrowLeft, FaBoxOpen } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaArrowLeft, FaBoxOpen, FaTimes, FaCamera } from 'react-icons/fa';
 
 const initialProducts = [
-    { id: 1, name: "Camisa Tailandesa 1", category: "Roupa", price: 150.00, stock: { P: 2, M: 5, G: 0, GG: 0, XG: 0 }, description: "Camisa top." },
-    { id: 2, name: "Copo Térmico", category: "Copo", price: 80.00, stock: 20, description: "Mantém gelado." },
+    { 
+        id: 1, 
+        name: "Camisa Tailandesa 1", 
+        category: "Roupa", 
+        price: 150.00, 
+        stock: { P: 2, M: 5, G: 0, GG: 0, XG: 0 }, 
+        description: "Camisa top.",
+        origin: "Internacional",
+        gender: "Masculino",
+        team: "Flamengo",
+        images: [] 
+    },
+    { 
+        id: 2, 
+        name: "Copo Térmico", 
+        category: "Copo", 
+        price: 80.00, 
+        stock: 20, 
+        description: "Mantém gelado.",
+        origin: "Nacional",
+        gender: "",
+        team: "",
+        images: []
+    },
 ];
 
 const Admin = () => {
@@ -56,7 +78,9 @@ const Admin = () => {
     return (
         <div className="admin-container">
             <header className="admin-header">
-                <h1>Painel Administrativo</h1>
+                <div className="header-title">
+                    <h1>Painel Administrativo</h1>
+                </div>
                 <div className="admin-actions">
                     {currentView === 'list' && (
                         <button className="btn-add" onClick={() => setCurrentView('category-select')}>
@@ -119,14 +143,23 @@ const ProductList = ({ products, onEdit, onDelete }) => {
             <tbody>
                 {products.map(p => (
                     <tr key={p.id}>
-                        {/* Adicionei data-label para responsividade CSS */}
-                        <td data-label="Nome">{p.name}</td>
+                        <td data-label="Nome">
+                            <span style={{fontWeight:'600'}}>{p.name}</span>
+                        </td>
                         <td data-label="Categoria"><span className="badge">{p.category}</span></td>
-                        <td data-label="Preço">R$ {parseFloat(p.price).toFixed(2)}</td>
+                        <td data-label="Preço" style={{color:'#27ae60', fontWeight:'bold'}}>
+                            R$ {parseFloat(p.price).toFixed(2)}
+                        </td>
                         <td data-label="Estoque">{formatStock(p.stock, p.category)}</td>
-                        <td data-label="Ações" className="actions-cell">
-                            <button className="edit-btn" onClick={() => onEdit(p)}><FaEdit /></button>
-                            <button className="delete-btn" onClick={() => onDelete(p.id)}><FaTrash /></button>
+                        <td data-label="Ações">
+                            <div className="actions-cell">
+                                <button className="edit-btn" onClick={() => onEdit(p)} title="Editar">
+                                    <FaEdit />
+                                </button>
+                                <button className="delete-btn" onClick={() => onDelete(p.id)} title="Excluir">
+                                    <FaTrash />
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 ))}
@@ -140,11 +173,12 @@ const CategorySelector = ({ onSelect, onCancel }) => {
     const categories = ["Roupas", "Acessorios", "Copo", "Garrafa", "Outros"];
     return (
         <div className="admin-form-container">
-            <h2>O que você vai cadastrar?</h2>
+            <h2 className="section-title">O que você vai cadastrar?</h2>
             <div className="category-grid-selector">
                 {categories.map(cat => (
                     <button key={cat} onClick={() => onSelect(cat === "Roupas" ? "Roupa" : cat)}>
-                        <FaBoxOpen size={24} /><br/>{cat}
+                        <div className="icon-area"><FaBoxOpen /></div>
+                        <span>{cat}</span>
                     </button>
                 ))}
             </div>
@@ -158,6 +192,15 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
     const [name, setName] = useState(initialData?.name || '');
     const [description, setDescription] = useState(initialData?.description || '');
     
+    // Novos campos
+    const [origin, setOrigin] = useState(initialData?.origin || 'Nacional');
+    const [gender, setGender] = useState(initialData?.gender || 'Masculino');
+    const [team, setTeam] = useState(initialData?.team || '');
+    
+    // Imagens (Armazena URL de preview ou Objeto File)
+    // Nota: Para o backend, você precisará iterar sobre isso e enviar os arquivos.
+    const [images, setImages] = useState(initialData?.images || []);
+
     // Novos campos de Preço
     const [costPrice, setCostPrice] = useState(initialData?.costPrice || ''); 
     const [salePrice, setSalePrice] = useState(initialData?.salePrice || ''); 
@@ -170,10 +213,36 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
     const [simpleQty, setSimpleQty] = useState(!initialData || category !== 'Roupa' ? (initialData?.stock || 0) : 0);
     const [sizesQty, setSizesQty] = useState(category === 'Roupa' ? (initialData?.stock || { P: 0, M: 0, G: 0, GG: 0, XG: 0 }) : {});
 
-    // Cálculo do preço final com desconto para exibição
+    // Cálculo do preço final
     const finalPrice = hasDiscount 
         ? (salePrice - (salePrice * (discountPercentage / 100))).toFixed(2) 
         : salePrice;
+
+    // --- LÓGICA DE UPLOAD DE ARQUIVO REAL ---
+    const handleFileSelect = (e, index) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Cria uma URL temporária para mostrar na tela imediatamente
+            const previewUrl = URL.createObjectURL(file);
+            
+            // Atualiza o estado
+            const newImages = [...images];
+            
+            // Aqui você pode salvar um objeto { file: file, preview: previewUrl } 
+            // se precisar do arquivo bruto para o backend depois. 
+            // Por enquanto, salvando a URL de preview para a UI funcionar:
+            newImages[index] = previewUrl; 
+            
+            // Opcional: Remover buracos no array
+            // const cleanImages = newImages.filter(img => img);
+            setImages(newImages);
+        }
+    };
+
+    const handleRemoveImage = (indexToRemove) => {
+        const newImages = images.filter((_, index) => index !== indexToRemove);
+        setImages(newImages);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -181,6 +250,10 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
             category,
             name,
             description,
+            origin,
+            gender,
+            team,
+            images,
             costPrice: parseFloat(costPrice),
             salePrice: parseFloat(salePrice),
             hasDiscount,
@@ -192,46 +265,119 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
 
     return (
         <div className="admin-form-container">
-            <div style={{display:'flex', alignItems:'center', gap:'10px', marginBottom:'20px'}}>
-                <button onClick={onCancel} className="btn-back"><FaArrowLeft /></button>
+            <div className="form-header-actions">
+                <button onClick={onCancel} className="btn-back-circle">
+                    <FaArrowLeft />
+                </button>
                 <h2>{initialData ? 'Editar' : 'Novo'} {category}</h2>
             </div>
             
             <form onSubmit={handleSubmit}>
+                {/* --- FOTOS --- */}
                 <div className="form-group">
-                    <label>Nome</label>
+                    <label>Fotos do Produto (Máx 5)</label>
+                    <div className="image-upload-grid">
+                        {[0, 1, 2, 3, 4].map((index) => (
+                            <div key={index} className="image-upload-box">
+                                {images[index] ? (
+                                    <div className="image-preview">
+                                        <img src={images[index]} alt={`Produto ${index}`} />
+                                        <button 
+                                            type="button" 
+                                            className="btn-remove-img"
+                                            onClick={() => handleRemoveImage(index)}
+                                        >
+                                            <FaTimes />
+                                        </button>
+                                        {index === 0 && <span className="main-label">Principal</span>}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <input 
+                                            type="file" 
+                                            id={`file-input-${index}`}
+                                            className="hidden-file-input"
+                                            accept="image/*"
+                                            onChange={(e) => handleFileSelect(e, index)}
+                                            disabled={index > images.length} 
+                                        />
+                                        <label 
+                                            htmlFor={`file-input-${index}`}
+                                            className={`btn-add-img ${index > images.length ? 'disabled' : ''}`}
+                                        >
+                                            <FaPlus />
+                                        </label>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label>Nome do Produto</label>
                     <input value={name} onChange={e => setName(e.target.value)} required />
+                </div>
+
+                {/* --- NOVOS CAMPOS --- */}
+                <div className="form-row">
+                    <div className="form-group" style={{flex:1}}>
+                        <label>Origem</label>
+                        <select value={origin} onChange={e => setOrigin(e.target.value)}>
+                            <option value="Nacional">Nacional</option>
+                            <option value="Internacional">Internacional</option>
+                        </select>
+                    </div>
+                    <div className="form-group" style={{flex:1}}>
+                        <label>Gênero</label>
+                        <select value={gender} onChange={e => setGender(e.target.value)}>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Infantil">Infantil</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label>Time (Opcional)</label>
+                    <input 
+                        type="text" 
+                        placeholder="Ex: Flamengo, Real Madrid..." 
+                        value={team} 
+                        onChange={e => setTeam(e.target.value)} 
+                    />
                 </div>
 
                 <div className="form-row">
                     <div className="form-group" style={{flex:1}}>
-                        <label>Custo (O que você pagou)</label>
-                        <input type="number" step="0.01" value={costPrice} onChange={e => setCostPrice(e.target.value)} required placeholder="R$ 0,00" />
+                        <label>Custo (R$)</label>
+                        <input type="number" step="0.01" value={costPrice} onChange={e => setCostPrice(e.target.value)} required placeholder="0,00" />
                     </div>
                     <div className="form-group" style={{flex:1}}>
-                        <label>Preço de Venda (S/ desconto)</label>
-                        <input type="number" step="0.01" value={salePrice} onChange={e => setSalePrice(e.target.value)} required placeholder="R$ 0,00" />
+                        <label>Venda (R$)</label>
+                        <input type="number" step="0.01" value={salePrice} onChange={e => setSalePrice(e.target.value)} required placeholder="0,00" />
                     </div>
                 </div>
 
-                <div className="discount-section" style={{background:'#f9f9f9', padding:'15px', borderRadius:'8px', marginBottom:'15px', border:'1px solid #eee'}}>
-                    <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap: 'wrap'}}>
-                        <label style={{fontWeight:'bold', cursor:'pointer', display: 'flex', alignItems: 'center'}}>
-                            <input type="checkbox" checked={hasDiscount} onChange={e => setHasDiscount(e.target.checked)} style={{marginRight:'10px', width: 'auto'}} />
+                {/* SEÇÃO PADRONIZADA: DESCONTO */}
+                <div className="form-section-box">
+                    <div className="section-header-row">
+                        <label className="checkbox-label">
+                            <input type="checkbox" checked={hasDiscount} onChange={e => setHasDiscount(e.target.checked)} />
                             Aplicar Desconto Promocional?
                         </label>
-                        {hasDiscount && <span style={{color:'#27ae60', fontWeight:'bold'}}>- {discountPercentage}%</span>}
+                        {hasDiscount && <span className="discount-badge">- {discountPercentage}%</span>}
                     </div>
 
                     {hasDiscount && (
-                        <div className="discount-inputs" style={{marginTop:'15px', display:'flex', alignItems:'center', gap:'15px'}}>
+                        <div className="discount-inputs">
                             <div style={{flex:1}}>
                                 <label>Porcentagem (%)</label>
                                 <input type="number" value={discountPercentage} onChange={e => setDiscountPercentage(e.target.value)} min="0" max="100" />
                             </div>
                             <div style={{flex:1}}>
                                 <label>Preço Vitrine</label>
-                                <div style={{padding:'10px', background:'#fff', border:'1px solid #ddd', borderRadius:'4px', fontWeight:'bold', color:'#e74c3c'}}>
+                                <div className="price-display">
                                     R$ {finalPrice}
                                 </div>
                             </div>
@@ -239,9 +385,10 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                     )}
                 </div>
 
+                {/* SEÇÃO PADRONIZADA: ESTOQUE */}
                 {category === 'Roupa' ? (
-                    <div className="form-group">
-                        <label>Estoque por Tamanho</label>
+                    <div className="form-section-box">
+                        <label style={{marginBottom:'15px', display:'block', fontWeight:'bold'}}>Estoque por Tamanho</label>
                         <div className="sizes-input-wrapper">
                             {Object.keys(sizesQty).map(size => (
                                 <div key={size} className="size-slot">
@@ -253,11 +400,16 @@ const ProductForm = ({ category, initialData, onSave, onCancel }) => {
                         </div>
                     </div>
                 ) : (
-                    <div className="form-group">
-                        <label>Quantidade em Estoque</label>
+                    <div className="form-section-box">
+                        <label style={{marginBottom:'10px', display:'block', fontWeight:'bold'}}>Quantidade em Estoque</label>
                         <input type="number" min="0" value={simpleQty} onChange={e => setSimpleQty(e.target.value)} required />
                     </div>
                 )}
+
+                <div className="form-group" style={{marginTop:'20px'}}>
+                    <label>Descrição</label>
+                    <textarea value={description} onChange={e => setDescription(e.target.value)} />
+                </div>
 
                 <div className="form-actions">
                     <button type="submit" className="btn-save">Salvar Produto</button>
