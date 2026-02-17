@@ -2,21 +2,27 @@ import axios from 'axios';
 
 // Cria a conexão com o backend
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api' // Porta definida no server.js
+    baseURL: 'http://localhost:3000/api' 
 });
 
-// Funções prontas para usar no Admin
+// --- SERVIÇO DA LOJA (Cliente) ---
+export const storeSvc = {
+    // Busca produtos para a Home com filtros
+    list: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        // Nota: agora aponta para /store/products
+        return api.get(`/store/products?${queryString}`);
+    },
+
+    // Busca opções para a Sidebar
+    getFilters: () => api.get('/store/filters')
+};
+
+// --- SERVIÇO DO ADMIN (Dashboard) ---
 export const productSvc = {
-    // Busca todos os produtos
     list: () => api.get('/products'),
-    
-    // Envia um novo produto (JSON com imagens em Base64 incluso)
     create: (data) => api.post('/products', data),
-    
-    // Atualiza um produto
     update: (id, data) => api.put(`/products/${id}`, data),
-    
-    // Deleta um produto
     delete: (id) => api.delete(`/products/${id}`)
 };
 

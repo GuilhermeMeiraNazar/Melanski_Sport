@@ -1,54 +1,62 @@
 import React, { useState } from 'react';
 import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
 
-// --- CONFIGURAÇÃO ---
-// Substitua pelo número real da loja (apenas números, com código do país e DDD)
+// Configuração do número da loja
 const PHONE_NUMBER = '5511999999999'; 
 
 function Modal({ selectedProduct, closeModal, addToCart }) {
     const [activeImgIndex, setActiveImgIndex] = useState(0);
     const [selectedSize, setSelectedSize] = useState(null);
 
+    // Se não tiver produto selecionado, não renderiza nada
     if (!selectedProduct) return null;
 
+    // Constantes e Arrays de dados
     const images = selectedProduct.images || [];
     const sizes = selectedProduct.sizes || [];
-    const discount = Math.round(((selectedProduct.oldPrice - selectedProduct.price) / selectedProduct.oldPrice) * 100);
+    const API_URL = 'http://localhost:5000';
 
-    // Função para comprar direto no WhatsApp
+    // --- LÓGICA DE PREÇOS E DESCONTO ---
+    const currentPrice = Number(selectedProduct.price) || 0;
+    const oldPrice = Number(selectedProduct.oldPrice) || 0;
+    
+    // Verifica se é oferta real para evitar cálculos errados
+    // A flag isOffer deve ser true E o preço antigo deve ser maior que o atual
+    const isOffer = selectedProduct.isOffer === true;
+    const hasDiscount = isOffer && oldPrice > currentPrice;
+
+    // Cálculo da porcentagem (arredondado)
+    const discountPercent = hasDiscount 
+        ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
+        : 0;
+
+    // Formatação visual do preço (separando inteiros e centavos)
+    const formattedPrice = currentPrice.toFixed(2);
+    const [priceInteger, priceDecimals] = formattedPrice.split('.');
+
+    // --- FUNÇÕES DE AÇÃO ---
     const handleBuyWhatsapp = () => {
-        // Validação de tamanho (se o produto tiver tamanhos)
         if (sizes.length > 0 && !selectedSize) {
             alert("Por favor, selecione um tamanho antes de ir para o WhatsApp.");
             return;
         }
 
-        // Formatação da mensagem
         let message = `Olá! Gostaria de comprar este item que vi no site:\n\n`;
         message += `*Produto:* ${selectedProduct.name}\n`;
-        
-        // Só adiciona linha de tamanho se tiver tamanho selecionado
-        if (selectedSize) {
-            message += `*Tamanho:* ${selectedSize}\n`;
-        }
-        
-        message += `*Preço:* R$ ${selectedProduct.price}\n`;
+        if (selectedSize) message += `*Tamanho:* ${selectedSize}\n`;
+        message += `*Preço:* R$ ${formattedPrice.replace('.', ',')}\n`;
         message += `\nAguardo confirmação de disponibilidade!`;
 
-        // Codifica a mensagem para URL e abre
         const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
     };
 
-    // Função interna para adicionar ao carrinho
     const onAddClick = () => {
         if (sizes.length > 0 && !selectedSize) {
             alert("Por favor, selecione um tamanho antes de adicionar.");
             return;
         }
-        // Chama a função passada pelo App.jsx
         addToCart(selectedProduct, selectedSize);
-        // Fecha o modal
         closeModal();
     };
 
@@ -58,11 +66,14 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                 <button className="modal-close" onClick={closeModal}>✕</button>
 
                 <div className="modal-body-grid">
-                    {/* COLUNA DA ESQUERDA: GALERIA */}
+                    {/* --- COLUNA DA ESQUERDA: GALERIA DE FOTOS --- */}
                     <div className="modal-gallery">
                         <div className="main-photo-frame">
                             {images.length > 0 ? (
-                                <img src={images[activeImgIndex]} alt={selectedProduct.name} />
+                                <img 
+                                    src={images[activeImgIndex].startsWith('http') ? images[activeImgIndex] : `${API_URL}${images[activeImgIndex]}`} 
+                                    alt={selectedProduct.name} 
+                                />
                             ) : (
                                 <div className="no-photo">Sem Imagem</div>
                             )}
@@ -75,27 +86,38 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                                     onMouseEnter={() => setActiveImgIndex(idx)}
                                     onClick={() => setActiveImgIndex(idx)}
                                 >
-                                    <img src={img} alt={`view ${idx}`} />
+                                    <img 
+                                        src={img.startsWith('http') ? img : `${API_URL}${img}`} 
+                                        alt={`view ${idx}`} 
+                                    />
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* COLUNA DA DIREITA: INFORMAÇÕES */}
+                    {/* --- COLUNA DA DIREITA: DETALHES DO PRODUTO --- */}
                     <div className="modal-details">
                         <div className="product-header-info">
                             <h1>{selectedProduct.name}</h1>
                         </div>
 
                         <div className="price-section">
-                            {selectedProduct.oldPrice && (
-                                <span className="old-price">R$ {selectedProduct.oldPrice.replace('.', ',')}</span>
+                            {/* Preço Antigo (só aparece se tiver desconto real) */}
+                            {hasDiscount && (
+                                <span className="old-price">
+                                    R$ {oldPrice.toFixed(2).replace('.', ',')}
+                                </span>
                             )}
+                            
                             <div className="current-price-row">
                                 <span className="currency">R$</span>
-                                <span className="value">{selectedProduct.price.split('.')[0]}</span>
-                                <span className="cents">,{selectedProduct.price.split('.')[1]}</span>
-                                <span className="discount-tag">{discount}% OFF</span>
+                                <span className="value">{priceInteger}</span>
+                                <span className="cents">,{priceDecimals}</span>
+                                
+                                {/* Tag de desconto */}
+                                {hasDiscount && (
+                                    <span className="discount-tag">{discountPercent}% OFF</span>
+                                )}
                             </div>
                         </div>
 
@@ -105,7 +127,12 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                         </div>
 
                         <div className="variations-section">
-                            <label>Tamanho: <span style={{fontWeight: 'normal', color: selectedSize ? '#dc143c' : '#999'}}>{selectedSize || 'Selecione'}</span></label>
+                            <label>
+                                Tamanho: 
+                                <span style={{fontWeight: 'normal', color: selectedSize ? '#dc143c' : '#999'}}>
+                                    {selectedSize || ' Selecione'}
+                                </span>
+                            </label>
                             <div className="size-selector">
                                 {sizes.map(size => (
                                     <button
@@ -120,7 +147,6 @@ function Modal({ selectedProduct, closeModal, addToCart }) {
                         </div>
 
                         <div className="action-buttons">
-                            {/* BOTÃO WHATSAPP CONECTADO */}
                             <button className="btn-buy-now" onClick={handleBuyWhatsapp}>
                                 <FaWhatsapp size={20} /> Comprar no WhatsApp
                             </button>

@@ -1,44 +1,85 @@
-// src/pages/Home.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaFilter } from 'react-icons/fa';
 import SidebarFilters from '../../components/SidebarFilters';
 import ProductCard from '../../components/ProductCard';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
+import { storeSvc } from '../../services/api';
 
-function Home({ onOpenCart, addToCart }) { // Adicionada a prop addToCart que vem do App.js
+function Home({ onOpenCart, addToCart }) {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
-    // --- LÓGICA DE PRODUTOS ---
-    const itemsPerPage = 12;
-    const allProducts = Array.from({ length: 204 }).map((_, index) => {
-        const price = (Math.random() * (350 - 150) + 150);
-        return {
-            id: index + 1,
-            name: `Camisa Oficial Edição ${index + 1} - Temporada 2024/25`,
-            price: price.toFixed(2),
-            oldPrice: (price * 1.2).toFixed(2),
-            type: index % 2 === 0 ? 'Nacional' : 'Internacional',
-            isOffer: index % 5 === 0,
-            rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
-            reviews: Math.floor(Math.random() * 500),
-            description: 'Produto oficial com tecnologia de respiração Dri-Fit.',
-            sizes: ['P', 'M', 'G', 'GG', 'XG'],
-            colors: ['Vermelho', 'Preto', 'Branco'],
-            images: [`https://placehold.co/600x600/f5f5f5/333?text=Frente-${index + 1}`]
-        };
+    // Estado dos filtros seguindo o padrão do seu backend
+    const [filters, setFilters] = useState({
+        page: 1,
+        search: '',
+        team: '',
+        category: '',
+        gender: '',
+        origin: '',
+        size: '',
+        is_offer: '',
+        is_launch: ''
     });
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = allProducts.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(allProducts.length / itemsPerPage);
+    // Dados de Paginação vindos do backend
+    const [paginationData, setPaginationData] = useState({
+        total: 0,
+        totalPages: 1,
+        currentPage: 1
+    });
+
+    // Efeito para carregar produtos sempre que os filtros mudarem
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                // Aqui usamos o storeSvc.list que você mencionou que funciona
+                const res = await storeSvc.list(filters);
+                
+                if (res.data) {
+                    // Mapeamento direto do seu storeController: { data: products, pagination: {...} }
+                    setProducts(res.data.data || []);
+                    setPaginationData(res.data.pagination || { totalPages: 1 });
+                }
+            } catch (error) {
+                console.error("Erro ao carregar produtos na Home:", error);
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [filters]);
+
+    // Função de atualização de filtros vinda da Sidebar
+    const handleFilterChange = (newFilters) => {
+        // Se for um reset (botão limpar), voltamos ao estado inicial
+        if (Object.keys(newFilters).length === 1 && newFilters.page === 1) {
+            setFilters({
+                page: 1,
+                search: '',
+                team: '',
+                category: '',
+                gender: '',
+                origin: '',
+                size: '',
+                is_offer: '',
+                is_launch: ''
+            });
+        } else {
+            // Caso contrário, mesclamos o que mudou
+            setFilters(prev => ({ ...prev, ...newFilters }));
+        }
+    };
 
     const paginate = (pageNumber) => {
-        setCurrentPage(pageNumber);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setFilters(prev => ({ ...prev, page: pageNumber }));
     };
 
     const handleProductClick = (product) => setSelectedProduct(product);
@@ -46,33 +87,54 @@ function Home({ onOpenCart, addToCart }) { // Adicionada a prop addToCart que ve
 
     return (
         <div className="main-container">
+            {/* Mantido o seu layout de botão mobile */}
             <button className="mobile-filter-btn" onClick={() => setMobileFilterOpen(true)}>
                 <FaFilter /> Filtros
             </button>
             
             <SidebarFilters 
                 mobileFilterOpen={mobileFilterOpen} 
-                setMobileFilterOpen={setMobileFilterOpen} 
+                setMobileFilterOpen={setMobileFilterOpen}
+                currentFilters={filters}
+                onFilterChange={handleFilterChange}
             />
             
             <main className="content-area">
-                <div className="product-grid">
-                    {currentItems.map((product) => (
-                        <ProductCard 
-                            key={product.id} 
-                            product={product} 
-                            handleProductClick={handleProductClick} 
-                        />
-                    ))}
-                </div>
-                <Pagination 
-                    currentPage={currentPage} 
-                    totalPages={totalPages} 
-                    paginate={paginate} 
-                />
+                {loading ? (
+                    /* Mantido o estilo de loading simples dentro da área de conteúdo */
+                    <div style={{ textAlign: 'center', marginTop: '50px' }}>Carregando produtos...</div>
+                ) : (
+                    <>
+                        <div className="product-grid">
+                            {products.length > 0 ? (
+                                products.map((product) => (
+                                    <ProductCard 
+                                        key={product.id} 
+                                        product={product} 
+                                        handleProductClick={handleProductClick} 
+                                    />
+                                ))
+                            ) : (
+                                /* Layout de "nada encontrado" respeitando o grid */
+                                <div style={{ width: '100%', textAlign: 'center', gridColumn: '1/-1', padding: '40px' }}>
+                                    <h3>Nenhum produto encontrado.</h3>
+                                    <p>Tente ajustar os filtros na barra lateral.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Paginação original só aparece se houver produtos e mais de uma página */}
+                        {products.length > 0 && paginationData.totalPages > 1 && (
+                            <Pagination 
+                                currentPage={filters.page} 
+                                totalPages={paginationData.totalPages} 
+                                paginate={paginate} 
+                            />
+                        )}
+                    </>
+                )}
             </main>
 
-            {/* Modal agora recebe a prop addToCart para poder enviar o item ao carrinho */}
             {selectedProduct && (
                 <Modal 
                     selectedProduct={selectedProduct} 
