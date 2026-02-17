@@ -3,7 +3,7 @@ import { FaShoppingCart, FaHeart, FaEye } from 'react-icons/fa';
 
 function ProductCard({ product, handleProductClick }) {
     // URL base da sua API
-    const API_URL = 'http://localhost:5000'; 
+    const API_URL = 'http://localhost:3000'; 
 
     // LÓGICA DE IMAGEM
     // Verifica se existe imagem, se é link externo ou local
@@ -11,8 +11,7 @@ function ProductCard({ product, handleProductClick }) {
         ? (product.images[0].startsWith('http') ? product.images[0] : `${API_URL}${product.images[0]}`)
         : null;
 
-    // LÓGICA DE PREÇO
-    // Convertemos para número para garantir operações matemáticas
+    // LÓGICA DE PREÇO (Item 2 e 5)
     const currentPrice = Number(product.price);
     const oldPrice = Number(product.oldPrice);
     
@@ -21,7 +20,7 @@ function ProductCard({ product, handleProductClick }) {
 
     return (
         <article className="product-card" onClick={() => handleProductClick(product)}>
-            {/* BADGES */}
+            {/* BADGES (Item 1 - Ícone verde para lançamentos) */}
             <div className="product-badges">
                 {isRealOffer && <span className="badge-offer">OFERTA</span>}
                 {product.isLaunch && <span className="badge-new">NOVO</span>}
@@ -45,16 +44,22 @@ function ProductCard({ product, handleProductClick }) {
 
             {/* INFORMAÇÕES */}
             <div className="card-info">
-                <span className="category-tag">{product.type}</span>
-                <h3>{product.name}</h3>
+                <div>
+                    <span className="category-tag">{product.type}</span>
+                    {/* O CSS encarrega-se da truncagem (...) e altura fixa */}
+                    <h3>{product.name}</h3>
+                </div>
                 
+                {/* Lógica de Preço (Item 2, 3 e 5) */}
                 <div className="price-row">
+                    {/* Preço de Venda (Se oferta, é o preço promocional. Se normal, é o preço padrão) */}
                     <p className="price">
                         R$ {currentPrice.toFixed(2).replace('.', ',')}
                     </p>
                     
+                    {/* Preço Riscado (Aparece APENAS se tiver oferta) */}
                     {isRealOffer && (
-                        <span className="old-price-card" style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9em', marginLeft: '8px' }}>
+                        <span className="old-price-card">
                             R$ {oldPrice.toFixed(2).replace('.', ',')}
                         </span>
                     )}

@@ -1,9 +1,9 @@
 /* _variables.scss */
-
 // Cores Principais
-$vermelho-principal: #dc143c; // Atualizado conforme seu main.scss
+$vermelho-principal: #dc143c; 
 $preto: #111;
 $branco: #fff;
+$verde-lancamento: #2ecc71; // Nova cor solicitada para Lançamentos (Item 1)
 
 // Cores Secundárias e Fundos
 $card-bg: #ffffff;
@@ -17,4 +17,4 @@ $shadow-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
 
 // Tipografia
 $font-primary: 'Inter', sans-serif;
-$fonte-secundaria: 'Arial', sans-serif; // Mantido do original caso use
+$fonte-secundaria: 'Arial', sans-serif;
