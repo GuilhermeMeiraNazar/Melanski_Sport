@@ -31,6 +31,9 @@ const productController = {
                 return {
                     ...prod,
                     price: prod.sale_price, // Para o Admin.jsx exibir o preço corretamente
+                    sale_price: prod.sale_price, // Preço base de venda
+                    has_discount: prod.has_discount, // Flag de desconto
+                    discount_percentage: prod.discount_percentage, // Percentual de desconto
                     images: prod.all_images ? prod.all_images.split(',') : [],
                     // Se for roupa, envia o objeto de tamanhos. Se não, pega o primeiro valor de estoque.
                     stock: (prod.category && prod.category.toUpperCase() === 'ROUPA') ? stockObj : (Object.values(stockObj)[0] || 0)

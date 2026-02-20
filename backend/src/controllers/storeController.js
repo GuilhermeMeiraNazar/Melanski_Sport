@@ -103,7 +103,7 @@ const storeController = {
 
                 // LOGICA DE PREÇO: sale_price é o valor base (ex: 200)
                 const originalPrice = parseFloat(prod.sale_price) || 0;
-                const discountPercent = parseFloat(prod.discount_percent) || 0;
+                const discountPercent = parseFloat(prod.discount_percentage) || 0;
                 
                 let finalPrice = originalPrice;
                 let oldPriceValue = null;
@@ -118,6 +118,9 @@ const storeController = {
                     name: prod.name,
                     description: prod.description,
                     price: finalPrice, 
+                    sale_price: originalPrice, // Preço base de venda
+                    has_discount: prod.has_discount, // Flag de desconto
+                    discount_percentage: discountPercent, // Percentual de desconto
                     oldPrice: oldPriceValue,
                     images: imagesArray,
                     sizes: Object.keys(stockObj).filter(key => stockObj[key] > 0),

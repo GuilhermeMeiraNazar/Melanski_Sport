@@ -16,8 +16,9 @@ const uploadImage = async (base64String) => {
                 {
                     width: width,
                     height: height,
-                    crop: "fill",
-                    gravity: "auto"
+                    crop: "fill", // Preenche o espaço mantendo proporções
+                    gravity: "center", // Centraliza o corte
+                    zoom: 0.85 // Leve zoom out para mostrar mais da imagem
                 },
                 {
                     fetch_format: "auto",

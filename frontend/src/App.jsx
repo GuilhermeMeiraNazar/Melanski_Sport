@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './assets/main.scss';
 import Header from './components/Header';
 import Cart from './components/Cart';
+import Footer from './components/Footer';
 import Home from './pages/client/Home';
 import Admin from './pages/admin/Admin';
 
@@ -38,6 +39,8 @@ function App() {
                         /> 
                         
                         <Home addToCart={addToCart} />
+
+                        <Footer />
 
                         {/* AQUI ESTAVA O SEGREDO: Passando a função removeItem */}
                         <Cart 
