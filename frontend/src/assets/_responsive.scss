@@ -97,7 +97,27 @@
             img { object-fit: contain; }
         }
         
-        .thumbnails-scroll { display: none; }
+        .thumbnails-scroll { 
+            display: flex; // Mostra as thumbnails no mobile
+            padding: 10px;
+            gap: 8px;
+            justify-content: flex-start;
+            overflow-x: auto; // Permite scroll horizontal
+            overflow-y: hidden;
+            
+            // Estilo de scrollbar mais bonito
+            &::-webkit-scrollbar {
+                height: 4px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: rgba(0,0,0,0.2);
+                border-radius: 2px;
+            }
+            
+            .thumb-item {
+                flex-shrink: 0; // Impede que as thumbnails encolham
+            }
+        }
     }
     
     .modal-details {

@@ -6,8 +6,26 @@ const PHONE_NUMBER = '5511999999999';
 
 const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
     
-    // Cálculo do total
-    const total = cartItems.reduce((acc, item) => acc + (Number(item.price) * item.quantity), 0);
+    // Função auxiliar para calcular preço com desconto
+    const calculateDiscountedPrice = (item) => {
+        const hasDiscount = item.has_discount === true || item.has_discount === 1;
+        const discountPercentage = Number(item.discount_percentage) || 0;
+        
+        if (hasDiscount && discountPercentage > 0) {
+            // Use sale_price as base price, fallback to price for compatibility
+            const basePrice = Number(item.sale_price || item.price);
+            return basePrice * (1 - discountPercentage / 100);
+        }
+        
+        // Use sale_price as base price, fallback to price for compatibility
+        return Number(item.sale_price || item.price);
+    };
+
+    // Cálculo do total usando preço com desconto quando aplicável
+    const total = cartItems.reduce((acc, item) => {
+        const finalPrice = calculateDiscountedPrice(item);
+        return acc + (finalPrice * item.quantity);
+    }, 0);
 
     // Função para gerar mensagem do pedido completo
     const handleFinalizeWhatsapp = () => {
@@ -24,7 +42,21 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                 message += `Tam: ${item.selectedSize}\n`;
             }
             
-            message += `Preço Unit.: R$ ${Number(item.price).toFixed(2).replace('.', ',')}\n`;
+            // Verifica se há desconto
+            const hasDiscount = item.has_discount === true || item.has_discount === 1;
+            const discountPercentage = Number(item.discount_percentage) || 0;
+            
+            if (hasDiscount && discountPercentage > 0) {
+                const originalPrice = Number(item.price);
+                const discountedPrice = calculateDiscountedPrice(item);
+                
+                message += `Preço Original: R$ ${originalPrice.toFixed(2).replace('.', ',')}\n`;
+                message += `Desconto: ${discountPercentage}%\n`;
+                message += `Preço com Desconto: R$ ${discountedPrice.toFixed(2).replace('.', ',')}\n`;
+            } else {
+                message += `Preço Unit.: R$ ${Number(item.price).toFixed(2).replace('.', ',')}\n`;
+            }
+            
             message += `------------------------------\n`;
         });
 
@@ -78,7 +110,30 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                                             <button>+</button>
                                         </div>
                                         <div className="price">
-                                            R$ {Number(item.price).toFixed(2).replace('.', ',')}
+                                            {(() => {
+                                                const hasDiscount = item.has_discount === true || item.has_discount === 1;
+                                                const discountPercentage = Number(item.discount_percentage) || 0;
+                                                
+                                                if (hasDiscount && discountPercentage > 0) {
+                                                    // Use sale_price as original price, fallback to price for compatibility
+                                                    const originalPrice = Number(item.sale_price || item.price);
+                                                    const discountedPrice = calculateDiscountedPrice(item);
+                                                    
+                                                    return (
+                                                        <>
+                                                            <div className="old-price-card">
+                                                                R$ {originalPrice.toFixed(2).replace('.', ',')}
+                                                            </div>
+                                                            <div className="discounted-price">
+                                                                R$ {discountedPrice.toFixed(2).replace('.', ',')}
+                                                            </div>
+                                                        </>
+                                                    );
+                                                }
+                                                
+                                                // Use sale_price as base price, fallback to price for compatibility
+                                                return `R$ ${Number(item.sale_price || item.price).toFixed(2).replace('.', ',')}`;
+                                            })()}
                                         </div>
                                     </div>
                                 </div>

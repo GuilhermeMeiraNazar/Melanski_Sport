@@ -12,18 +12,57 @@ function ProductCard({ product, handleProductClick }) {
         : null;
 
     // LÓGICA DE PREÇO (Item 2 e 5)
-    const currentPrice = Number(product.price);
-    const oldPrice = Number(product.oldPrice);
+    // Use sale_price as base price, fallback to price for compatibility
+    const basePrice = Number(product.sale_price || product.price);
     
-    // Só consideramos oferta se a flag estiver ativa E o preço antigo for maior que o atual
-    const isRealOffer = product.isOffer && oldPrice > currentPrice;
+    // Check if product has active discount
+    // has_discount can be boolean or number (1/0 from MySQL)
+    const hasActiveDiscount = (product.has_discount === true || product.has_discount === 1) 
+                              && product.discount_percentage > 0;
+    
+    // Calculate discounted price if discount is active
+    const discountedPrice = hasActiveDiscount 
+        ? basePrice * (1 - product.discount_percentage / 100)
+        : basePrice;
+    
+    // Determine which price to display
+    const displayPrice = hasActiveDiscount ? discountedPrice : basePrice;
+
+    // LÓGICA DE ESTOQUE
+    // Verifica se o produto está esgotado
+    const isOutOfStock = () => {
+        // Se sizes é um array, verifica se está vazio
+        if (Array.isArray(product.sizes)) {
+            return product.sizes.length === 0;
+        }
+        // Se stock é um objeto, verifica se todos os valores são 0
+        if (typeof product.stock === 'object' && product.stock !== null) {
+            return Object.values(product.stock).every(qty => qty === 0);
+        }
+        // Se stock é um número, verifica se é 0
+        if (typeof product.stock === 'number') {
+            return product.stock === 0;
+        }
+        // Por padrão, considera que tem estoque
+        return false;
+    };
+
+    const outOfStock = isOutOfStock();
+
+    // Função para lidar com o clique - bloqueia se estiver esgotado
+    const handleClick = () => {
+        if (!outOfStock) {
+            handleProductClick(product);
+        }
+    };
 
     return (
-        <article className="product-card" onClick={() => handleProductClick(product)}>
+        <article className={`product-card ${outOfStock ? 'out-of-stock' : ''}`} onClick={handleClick}>
             {/* BADGES (Item 1 - Ícone verde para lançamentos) */}
             <div className="product-badges">
-                {isRealOffer && <span className="badge-offer">OFERTA</span>}
-                {product.isLaunch && <span className="badge-new">NOVO</span>}
+                {outOfStock && <span className="badge-out-of-stock">ESGOTADO</span>}
+                {!outOfStock && hasActiveDiscount && <span className="badge-offer">OFERTA</span>}
+                {!outOfStock && product.isLaunch && <span className="badge-new">NOVO</span>}
             </div>
             
             {/* IMAGEM */}
@@ -32,8 +71,7 @@ function ProductCard({ product, handleProductClick }) {
                     <img 
                         src={mainImage} 
                         alt={product.name} 
-                        className="product-img" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        className="product-img"
                     />
                 ) : (
                     <div className="product-img-fallback" style={{ background: '#f0f0f0', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
@@ -52,15 +90,15 @@ function ProductCard({ product, handleProductClick }) {
                 
                 {/* Lógica de Preço (Item 2, 3 e 5) */}
                 <div className="price-row">
-                    {/* Preço de Venda (Se oferta, é o preço promocional. Se normal, é o preço padrão) */}
+                    {/* Preço de Venda (Se desconto ativo, mostra preço com desconto. Se normal, mostra preço base) */}
                     <p className="price">
-                        R$ {currentPrice.toFixed(2).replace('.', ',')}
+                        R$ {displayPrice.toFixed(2).replace('.', ',')}
                     </p>
                     
-                    {/* Preço Riscado (Aparece APENAS se tiver oferta) */}
-                    {isRealOffer && (
+                    {/* Preço Riscado (Aparece APENAS se tiver desconto ativo) */}
+                    {hasActiveDiscount && (
                         <span className="old-price-card">
-                            R$ {oldPrice.toFixed(2).replace('.', ',')}
+                            R$ {basePrice.toFixed(2).replace('.', ',')}
                         </span>
                     )}
                 </div>
