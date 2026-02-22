@@ -31,7 +31,7 @@ const storeController = {
                 params.push(team);
             }
             if (category) {
-                whereClause += ' AND p.category = ?';
+                whereClause += ' AND pc.name = ?';
                 params.push(category);
             }
             if (gender) {
@@ -58,10 +58,12 @@ const storeController = {
 
             const query = `
                 SELECT p.*, 
+                pc.name as category_name,
                 GROUP_CONCAT(DISTINCT i.image_url ORDER BY i.is_main DESC, i.id ASC) as all_images,
                 GROUP_CONCAT(DISTINCT CONCAT(inv.size, ':', inv.quantity)) as stock_data,
                 (p.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as is_new_release
                 FROM products p 
+                LEFT JOIN product_categories pc ON p.category_id = pc.id
                 LEFT JOIN product_images i ON p.id = i.product_id 
                 LEFT JOIN product_inventory inv ON p.id = inv.product_id
                 ${whereClause}
@@ -81,6 +83,7 @@ const storeController = {
             const countQuery = `
                 SELECT COUNT(DISTINCT p.id) as total 
                 FROM products p 
+                LEFT JOIN product_categories pc ON p.category_id = pc.id
                 LEFT JOIN product_inventory inv ON p.id = inv.product_id
                 ${whereClause}
             `;
@@ -101,7 +104,6 @@ const storeController = {
 
                 const imagesArray = prod.all_images ? prod.all_images.split(',') : [];
 
-                // LOGICA DE PREÇO: sale_price é o valor base (ex: 200)
                 const originalPrice = parseFloat(prod.sale_price) || 0;
                 const discountPercent = parseFloat(prod.discount_percentage) || 0;
                 
@@ -110,17 +112,18 @@ const storeController = {
 
                 if (prod.has_discount === 1 && discountPercent > 0) {
                     finalPrice = originalPrice - (originalPrice * (discountPercent / 100));
-                    oldPriceValue = originalPrice; // O preço original vai para o campo de riscado
+                    oldPriceValue = originalPrice;
                 }
 
                 return {
                     id: prod.id,
                     name: prod.name,
                     description: prod.description,
+                    category: prod.category_name || 'Sem categoria',
                     price: finalPrice, 
-                    sale_price: originalPrice, // Preço base de venda
-                    has_discount: prod.has_discount, // Flag de desconto
-                    discount_percentage: discountPercent, // Percentual de desconto
+                    sale_price: originalPrice,
+                    has_discount: prod.has_discount,
+                    discount_percentage: discountPercent,
                     oldPrice: oldPriceValue,
                     images: imagesArray,
                     sizes: Object.keys(stockObj).filter(key => stockObj[key] > 0),
@@ -150,13 +153,13 @@ const storeController = {
     getSidebarOptions: async (req, res) => {
         try {
             const [teams] = await db.execute('SELECT DISTINCT team FROM products WHERE team IS NOT NULL AND team != "" ORDER BY team ASC');
-            const [types] = await db.execute('SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category ASC');
+            const [categories] = await db.execute('SELECT DISTINCT pc.name FROM product_categories pc INNER JOIN products p ON p.category_id = pc.id ORDER BY pc.name ASC');
             const [genders] = await db.execute('SELECT DISTINCT gender FROM products WHERE gender IS NOT NULL AND gender != ""');
             const [sizes] = await db.execute('SELECT DISTINCT size FROM product_inventory WHERE quantity > 0 ORDER BY size ASC');
 
             res.json({
                 times: teams.map(t => t.team),
-                tipos: types.map(t => t.category),
+                tipos: categories.map(c => c.name),
                 generos: genders.map(g => g.gender),
                 tamanhos: sizes.map(s => s.size).filter(s => s !== 'Geral' && s !== 'Único')
             });

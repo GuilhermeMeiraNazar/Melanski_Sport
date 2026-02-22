@@ -4,7 +4,10 @@ require('dotenv').config();
 
 // Importação das rotas
 const productRoutes = require('./routes/productRoutes');
-const storeRoutes = require('./routes/storeRoutes'); // Nova rota adicionada aqui
+const storeRoutes = require('./routes/storeRoutes');
+const authRoutes = require('./routes/authRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const activityLogRoutes = require('./routes/activityLogRoutes');
 
 const app = express();
 
@@ -16,10 +19,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Rotas
-// Rota de administração (CRUD de produtos)
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/products', productRoutes);
-
-// Rota da Loja (Filtros dinâmicos, Home, Lançamentos e Ofertas)
 app.use('/api/store', storeRoutes);
 
 // Porta do Servidor

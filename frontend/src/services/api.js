@@ -1,20 +1,47 @@
 import axios from 'axios';
 
-// Cria a conexão com o backend
 const api = axios.create({
     baseURL: 'http://localhost:3000/api' 
 });
 
-// --- SERVIÇO DA LOJA (Cliente) ---
-export const storeSvc = {
-    // Busca produtos para a Home com filtros
+// Interceptor para adicionar token em todas as requisições
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// --- SERVIÇO DE AUTENTICAÇÃO ---
+export const authSvc = {
+    login: (email, password) => api.post('/auth/login', { email, password }),
+    register: (data) => api.post('/auth/register', data),
+    validate: () => api.get('/auth/validate')
+};
+
+// --- SERVIÇO DE CATEGORIAS ---
+export const categorySvc = {
+    list: () => api.get('/categories'),
+    create: (data) => api.post('/categories', data),
+    update: (id, data) => api.put(`/categories/${id}`, data),
+    delete: (id) => api.delete(`/categories/${id}`)
+};
+
+// --- SERVIÇO DE LOGS DE ATIVIDADE ---
+export const activityLogSvc = {
     list: (params = {}) => {
         const queryString = new URLSearchParams(params).toString();
-        // Nota: agora aponta para /store/products
+        return api.get(`/activity-logs?${queryString}`);
+    }
+};
+
+// --- SERVIÇO DA LOJA (Cliente) ---
+export const storeSvc = {
+    list: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
         return api.get(`/store/products?${queryString}`);
     },
-
-    // Busca opções para a Sidebar
     getFilters: () => api.get('/store/filters')
 };
 

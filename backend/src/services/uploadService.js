@@ -27,12 +27,25 @@ const uploadImage = async (base64String) => {
             ]
         });
 
-        // Retorna a URL segura gerada pelo Cloudinary
-        return result.secure_url; 
+        // Retorna a URL segura e o public_id para deletar depois
+        return {
+            url: result.secure_url,
+            public_id: result.public_id
+        };
     } catch (error) {
         console.error("Erro no upload para o Cloudinary:", error);
         throw error;
     }
 };
 
-module.exports = { uploadImage };
+const deleteImage = async (publicId) => {
+    try {
+        const result = await cloudinary.uploader.destroy(publicId);
+        return result;
+    } catch (error) {
+        console.error("Erro ao deletar imagem do Cloudinary:", error);
+        throw error;
+    }
+};
+
+module.exports = { uploadImage, deleteImage };

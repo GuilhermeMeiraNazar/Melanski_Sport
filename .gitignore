@@ -46,3 +46,6 @@ Thumbs.db
 # --- Ferramentas de Build (Vite/outros) ---
 .vite/
 .turbo/
+
+# --- Documentacao e Anotacoes do Kiro ---
+Kiro/

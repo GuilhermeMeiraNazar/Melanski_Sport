@@ -31,12 +31,46 @@ $vermelho-principal: #dc143c;
 
         .top-links {
             @include flex-center;
-            gap: 20px;
+            gap: 15px;
+            
             span {
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 gap: 5px;
+            }
+
+            .user-greeting {
+                font-size: 0.75rem;
+                cursor: default;
+            }
+
+            .admin-btn, .logout-btn {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: $branco;
+                padding: 5px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.7rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                transition: all 0.3s;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: translateY(-1px);
+                }
+            }
+
+            .logout-btn {
+                background: rgba(0, 0, 0, 0.2);
+                
+                &:hover {
+                    background: rgba(0, 0, 0, 0.4);
+                }
             }
         }
     }

@@ -1,0 +1,67 @@
+.login-modal {
+    max-width: 400px;
+    padding: 30px;
+
+    h2 {
+        margin-bottom: 25px;
+        text-align: center;
+        color: $vermelho-principal;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: $text-color;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+
+            &:focus {
+                outline: none;
+                border-color: $vermelho-principal;
+            }
+        }
+    }
+
+    .error-message {
+        background: #fee;
+        color: #c33;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: $vermelho-principal;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+
+        &:hover:not(:disabled) {
+            background: darken($vermelho-principal, 10%);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
