@@ -1,54 +1,146 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaTrash, FaWhatsapp } from 'react-icons/fa';
 import { calculateFinalPrice, formatPrice, hasActiveDiscount } from '../utils/priceUtils';
+import { orderSvc } from '../services/api';
+import { getErrorMessage } from '../utils/apiHelpers';
 
 // --- CONFIGURAÇÃO ---
 const PHONE_NUMBER = '5511999999999'; 
 
 const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [showOrderForm, setShowOrderForm] = useState(false);
+    const [customerData, setCustomerData] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        address: '',
+        city: '',
+        state: '',
+        zip: '',
+        notes: ''
+    });
+
     // Cálculo do total usando utilitário centralizado
     const total = cartItems.reduce((acc, item) => {
         const finalPrice = calculateFinalPrice(item);
         return acc + (finalPrice * item.quantity);
     }, 0);
 
+    // Função para criar pedido no sistema
+    const createOrder = async () => {
+        try {
+            setIsProcessing(true);
+
+            // Validar dados obrigatórios
+            if (!customerData.name || !customerData.phone || !customerData.address || 
+                !customerData.city || !customerData.state || !customerData.zip) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return null;
+            }
+
+            // Preparar dados do pedido
+            const orderData = {
+                customer_name: customerData.name,
+                customer_phone: customerData.phone,
+                customer_email: customerData.email || null,
+                delivery_address: customerData.address,
+                delivery_city: customerData.city,
+                delivery_state: customerData.state.toUpperCase(),
+                delivery_zip: customerData.zip,
+                notes: customerData.notes || null,
+                items: cartItems.map(item => ({
+                    product_id: item.id,
+                    product_name: item.name,
+                    product_size: item.selectedSize || null,
+                    product_image: item.images && item.images.length > 0 ? item.images[0] : null,
+                    quantity: item.quantity,
+                    unit_price: calculateFinalPrice(item)
+                }))
+            };
+
+            // Criar pedido
+            const response = await orderSvc.create(orderData);
+            return response.data.order_number;
+        } catch (error) {
+            console.error('Erro ao criar pedido:', error);
+            alert(getErrorMessage(error));
+            return null;
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     // Função para gerar mensagem do pedido completo
-    const handleFinalizeWhatsapp = () => {
+    const handleFinalizeWhatsapp = async () => {
         if (cartItems.length === 0) return;
 
-        let message = `Olá! Gostaria de finalizar o seguinte pedido feito no site:\n\n`;
+        // Mostrar formulário se ainda não foi preenchido
+        if (!customerData.name) {
+            setShowOrderForm(true);
+            return;
+        }
+
+        // Criar pedido no sistema
+        const orderNumber = await createOrder();
+        if (!orderNumber) return;
+
+        // Gerar mensagem do WhatsApp
+        let message = `🛍️ *NOVO PEDIDO - ${orderNumber}*\n\n`;
+        message += `👤 *Cliente:* ${customerData.name}\n`;
+        message += `📱 *Telefone:* ${customerData.phone}\n`;
+        if (customerData.email) {
+            message += `📧 *Email:* ${customerData.email}\n`;
+        }
+        message += `\n📍 *Endereço de Entrega:*\n`;
+        message += `${customerData.address}\n`;
+        message += `${customerData.city}/${customerData.state} - CEP: ${customerData.zip}\n`;
+        
+        if (customerData.notes) {
+            message += `\n📝 *Observações:* ${customerData.notes}\n`;
+        }
+
+        message += `\n🛒 *ITENS DO PEDIDO:*\n\n`;
 
         cartItems.forEach((item, index) => {
-            message += `*Item ${index + 1}:* ${item.name}\n`;
-            message += `Qtd: ${item.quantity}\n`;
+            message += `*${index + 1}. ${item.name}*\n`;
+            message += `   Qtd: ${item.quantity}`;
             
-            // Só mostra o tamanho se existir
             if (item.selectedSize) {
-                message += `Tam: ${item.selectedSize}\n`;
+                message += ` | Tam: ${item.selectedSize}`;
             }
+            message += `\n`;
             
-            // Verifica se há desconto usando utilitário
             const hasDiscount = hasActiveDiscount(item.has_discount, item.discount_percentage);
+            const finalPrice = calculateFinalPrice(item);
             
             if (hasDiscount) {
                 const originalPrice = Number(item.sale_price || item.price);
-                const discountedPrice = calculateFinalPrice(item);
-                
-                message += `Preço Original: ${formatPrice(originalPrice)}\n`;
-                message += `Desconto: ${item.discount_percentage}%\n`;
-                message += `Preço com Desconto: ${formatPrice(discountedPrice)}\n`;
+                message += `   ~~${formatPrice(originalPrice)}~~ → ${formatPrice(finalPrice)} (-${item.discount_percentage}%)\n`;
             } else {
-                message += `Preço Unit.: ${formatPrice(item.sale_price || item.price)}\n`;
+                message += `   ${formatPrice(finalPrice)}\n`;
             }
             
-            message += `------------------------------\n`;
+            message += `\n`;
         });
 
-        message += `\n*TOTAL DO PEDIDO: ${formatPrice(total)}*`;
-        message += `\n\nAguardo as instruções para pagamento!`;
+        message += `💰 *TOTAL: ${formatPrice(total)}*\n\n`;
+        message += `✅ Pedido registrado no sistema!\n`;
+        message += `Aguardo as instruções para pagamento.`;
 
         const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
+
+        // Limpar carrinho e fechar
+        alert(`Pedido ${orderNumber} criado com sucesso! Você será redirecionado para o WhatsApp.`);
+        // Aqui você pode limpar o carrinho se tiver uma função para isso
+        onClose();
+    };
+
+    const handleSubmitForm = (e) => {
+        e.preventDefault();
+        setShowOrderForm(false);
+        handleFinalizeWhatsapp();
     };
 
     if (!isOpen) return null;
@@ -58,11 +150,110 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
             <div className="cart-sidebar" onClick={(e) => e.stopPropagation()}>
                 
                 <div className="cart-header">
-                    <h2>Seu Carrinho</h2>
+                    <h2>{showOrderForm ? 'Dados para Entrega' : 'Seu Carrinho'}</h2>
                     <button className="close-btn" onClick={onClose}>&times;</button>
                 </div>
 
-                <div className="cart-items-wrapper">
+                {showOrderForm ? (
+                    <form className="order-form" onSubmit={handleSubmitForm}>
+                        <div className="form-group">
+                            <label>Nome Completo *</label>
+                            <input
+                                type="text"
+                                value={customerData.name}
+                                onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Telefone (WhatsApp) *</label>
+                            <input
+                                type="tel"
+                                value={customerData.phone}
+                                onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+                                placeholder="(11) 98765-4321"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input
+                                type="email"
+                                value={customerData.email}
+                                onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Endereço Completo *</label>
+                            <input
+                                type="text"
+                                value={customerData.address}
+                                onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
+                                placeholder="Rua, número, complemento"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Cidade *</label>
+                                <input
+                                    type="text"
+                                    value={customerData.city}
+                                    onChange={(e) => setCustomerData({...customerData, city: e.target.value})}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Estado *</label>
+                                <input
+                                    type="text"
+                                    value={customerData.state}
+                                    onChange={(e) => setCustomerData({...customerData, state: e.target.value})}
+                                    placeholder="SP"
+                                    maxLength="2"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>CEP *</label>
+                            <input
+                                type="text"
+                                value={customerData.zip}
+                                onChange={(e) => setCustomerData({...customerData, zip: e.target.value})}
+                                placeholder="01234-567"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Observações</label>
+                            <textarea
+                                value={customerData.notes}
+                                onChange={(e) => setCustomerData({...customerData, notes: e.target.value})}
+                                placeholder="Ex: Entregar no período da tarde"
+                                rows="3"
+                            />
+                        </div>
+
+                        <div className="form-actions">
+                            <button type="button" className="btn-back" onClick={() => setShowOrderForm(false)}>
+                                Voltar
+                            </button>
+                            <button type="submit" className="btn-submit" disabled={isProcessing}>
+                                {isProcessing ? 'Processando...' : 'Finalizar Pedido'}
+                            </button>
+                        </div>
+                    </form>
+                ) : (
+                    <>
+                        <div className="cart-items-wrapper">
                     {cartItems.length === 0 ? (
                         <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>Seu carrinho está vazio.</p>
                     ) : (
@@ -120,19 +311,25 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                                 </div>
                             </div>
                         ))
-                    )}
-                </div>
+                        </div>
 
-                <div className="cart-footer">
-                    <div className="total-row">
-                        <span>Total do Pedido:</span>
-                        <strong>{formatPrice(total)}</strong>
-                    </div>
-                    {/* Botão conectado à função de WhatsApp */}
-                    <button className="btn-whatsapp" onClick={handleFinalizeWhatsapp}>
-                        <FaWhatsapp size={20} /> Finalizar no WhatsApp
-                    </button>
-                </div>
+                        <div className="cart-footer">
+                            <div className="total-row">
+                                <span>Total do Pedido:</span>
+                                <strong>{formatPrice(total)}</strong>
+                            </div>
+                            {/* Botão conectado à função de WhatsApp */}
+                            <button 
+                                className="btn-whatsapp" 
+                                onClick={handleFinalizeWhatsapp}
+                                disabled={isProcessing}
+                            >
+                                <FaWhatsapp size={20} /> 
+                                {isProcessing ? 'Processando...' : 'Finalizar no WhatsApp'}
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

@@ -269,3 +269,89 @@ h3 {
         }
     }
 }
+
+
+// Formulário de dados do cliente
+.order-form {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+
+    .form-group {
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+
+            &:focus {
+                outline: none;
+                border-color: $vermelho-principal;
+            }
+        }
+
+        textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 10px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+
+        .btn-back {
+            background: #f0f0f0;
+            color: #555;
+
+            &:hover:not(:disabled) {
+                background: #e0e0e0;
+            }
+        }
+
+        .btn-submit {
+            background: $vermelho-principal;
+            color: white;
+
+            &:hover:not(:disabled) {
+                background: darken($vermelho-principal, 10%);
+            }
+        }
+    }
+}

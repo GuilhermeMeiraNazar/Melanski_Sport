@@ -8,6 +8,7 @@ const storeRoutes = require('./routes/storeRoutes');
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const activityLogRoutes = require('./routes/activityLogRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // Importação do middleware de erro
 const { errorHandler } = require('./middleware/errorHandler');
@@ -27,6 +28,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/store', storeRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Middleware de tratamento de erros (deve ser o último)
 app.use(errorHandler);

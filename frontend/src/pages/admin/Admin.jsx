@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     FaPlus, FaSignOutAlt, FaArrowLeft, FaHistory, 
     FaTags, FaChartLine, FaUsers, FaPalette, 
-    FaFileExport, FaBars 
+    FaFileExport, FaBars, FaShoppingCart 
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { productSvc } from '../../services/api';
@@ -18,6 +18,7 @@ import InsightsView from '../../components/admin/InsightsView';
 import AppearanceEditor from '../../components/admin/AppearanceEditor';
 import ExportManager from '../../components/admin/ExportManager';
 import UserManagement from '../../components/admin/UserManagement';
+import OrdersView from '../../components/admin/OrdersView';
 
 // Componentes externos
 import ActivityLogs from '../../components/ActivityLogs';
@@ -146,6 +147,9 @@ const Admin = () => {
                             <button className="btn-add" onClick={() => setCurrentView('category-select')}>
                                 <FaPlus /> Novo Produto
                             </button>
+                            <button className="btn-orders" onClick={() => setCurrentView('orders')}>
+                                <FaShoppingCart /> Vendas
+                            </button>
                             {canManageCategories && (
                                 <button className="btn-categories" onClick={() => setCurrentView('categories')}>
                                     <FaTags /> Categorias
@@ -263,6 +267,10 @@ const Admin = () => {
 
                 {currentView === 'users' && user.role === 'developer' && (
                     <UserManagement userRole={user.role} />
+                )}
+
+                {currentView === 'orders' && (
+                    <OrdersView />
                 )}
             </main>
         </div>

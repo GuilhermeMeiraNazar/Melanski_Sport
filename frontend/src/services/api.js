@@ -82,4 +82,15 @@ export const productSvc = {
     delete: (id) => api.delete(`/products/${id}`)
 };
 
+// --- SERVIÇO DE PEDIDOS ---
+export const orderSvc = {
+    list: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return api.get(`/orders?${queryString}`);
+    },
+    getById: (id) => api.get(`/orders/${id}`),
+    create: (data) => api.post('/orders', data),
+    updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status })
+};
+
 export default api;

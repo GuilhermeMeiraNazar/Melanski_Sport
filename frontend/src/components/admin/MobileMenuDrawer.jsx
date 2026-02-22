@@ -2,7 +2,7 @@ import React from 'react';
 import { 
     FaTimes, FaArrowLeft, FaTags, FaHistory, 
     FaPalette, FaFileExport, FaChartLine, 
-    FaUsers, FaSignOutAlt 
+    FaUsers, FaSignOutAlt, FaShoppingCart 
 } from 'react-icons/fa';
 
 /**
@@ -44,6 +44,14 @@ const MobileMenuDrawer = ({
                             <span>Voltar para Lista</span>
                         </button>
                     )}
+                    
+                    <button 
+                        className="mobile-menu-item" 
+                        onClick={() => handleNavigation('orders')}
+                    >
+                        <FaShoppingCart />
+                        <span>Vendas</span>
+                    </button>
                     
                     {canManageCategories && (
                         <button 
