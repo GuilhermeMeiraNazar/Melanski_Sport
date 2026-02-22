@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { storeSvc } from '../services/api';
+import { useCache } from '../contexts/CacheContext';
 
 function SidebarFilters({ mobileFilterOpen, setMobileFilterOpen, currentFilters = {}, onFilterChange }) {
+    const { getCached } = useCache();
     const [options, setOptions] = useState({
-        times: ["Flamengo", "Grêmio", "Palmeiras", "Corinthians", "São Paulo", "Vasco", "Cruzeiro"],
-        tipos: ["Camisa", "Copo", "Bola", "Agasalho", "Boné"],
-        tamanhos: ["P", "M", "G", "GG", "XG"],
-        generos: ["Masculino", "Feminino", "Infantil"]
+        times: [],
+        tipos: [],
+        tamanhos: [],
+        generos: []
     });
 
     const [localSearch, setLocalSearch] = useState(currentFilters.search || '');
@@ -15,13 +17,24 @@ function SidebarFilters({ mobileFilterOpen, setMobileFilterOpen, currentFilters 
     useEffect(() => {
         async function loadFilters() {
             try {
-                const res = await storeSvc.getFilters();
-                if (res.data) {
+                // Usar cache com TTL de 10 minutos para opções de filtros
+                // Dados estáticos que raramente mudam
+                const data = await getCached(
+                    'sidebar_filters',
+                    async () => {
+                        const res = await storeSvc.getFilters();
+                        return res.data; // Retornar apenas os dados
+                    },
+                    600000, // 10 minutos
+                    true // Usar localStorage para persistência
+                );
+                
+                if (data) {
                     setOptions({
-                        times: res.data.times || options.times,
-                        tipos: res.data.tipos || options.tipos,
-                        tamanhos: res.data.tamanhos || options.tamanhos,
-                        generos: res.data.generos || options.generos
+                        times: data.times || [],
+                        tipos: data.tipos || [],
+                        tamanhos: data.tamanhos || [],
+                        generos: data.generos || []
                     });
                 }
             } catch (error) {
@@ -29,7 +42,7 @@ function SidebarFilters({ mobileFilterOpen, setMobileFilterOpen, currentFilters 
             }
         }
         loadFilters();
-    }, []);
+    }, [getCached]);
 
     const handleToggle = (key, value) => {
         const newValue = currentFilters[key] === value ? '' : value;

@@ -9,6 +9,9 @@ const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const activityLogRoutes = require('./routes/activityLogRoutes');
 
+// Importação do middleware de erro
+const { errorHandler } = require('./middleware/errorHandler');
+
 const app = express();
 
 // Middlewares
@@ -24,6 +27,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/store', storeRoutes);
+
+// Middleware de tratamento de erros (deve ser o último)
+app.use(errorHandler);
 
 // Porta do Servidor
 const PORT = process.env.PORT || 3000;

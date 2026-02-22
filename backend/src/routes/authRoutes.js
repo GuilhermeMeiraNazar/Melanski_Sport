@@ -2,19 +2,29 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const { authenticate } = require('../middleware/auth');
+const validate = require('../middleware/validate');
+const { authLimiter, apiLimiter } = require('../middleware/rateLimiter');
+const {
+    registerSchema,
+    loginSchema,
+    verifyEmailSchema,
+    updateProfileSchema,
+    changePasswordSchema,
+    requestPasswordResetSchema,
+    resetPasswordSchema
+} = require('../validators/authValidator');
 
-router.post('/login', authController.login);
-router.post('/register', authController.register);
-router.post('/verify-email', authController.verifyEmail);
-router.post('/resend-code', authController.resendVerificationCode);
-router.get('/validate', authenticate, authController.validateToken);
+// Rotas públicas com rate limiting mais restritivo
+router.post('/login', authLimiter, validate(loginSchema), authController.login);
+router.post('/register', authLimiter, validate(registerSchema), authController.register);
+router.post('/verify-email', authLimiter, validate(verifyEmailSchema), authController.verifyEmail);
+router.post('/resend-code', authLimiter, validate(requestPasswordResetSchema), authController.resendVerificationCode);
+router.post('/request-password-reset', authLimiter, validate(requestPasswordResetSchema), authController.requestPasswordReset);
+router.post('/reset-password', authLimiter, validate(resetPasswordSchema), authController.resetPassword);
 
-// Rotas protegidas para atualização de perfil
-router.put('/profile', authenticate, authController.updateProfile);
-router.put('/change-password', authenticate, authController.changePassword);
-
-// Rotas de recuperação de senha
-router.post('/request-password-reset', authController.requestPasswordReset);
-router.post('/reset-password', authController.resetPassword);
+// Rotas protegidas com rate limiting normal
+router.get('/validate', authenticate, apiLimiter, authController.validateToken);
+router.put('/profile', authenticate, apiLimiter, validate(updateProfileSchema), authController.updateProfile);
+router.put('/change-password', authenticate, authLimiter, validate(changePasswordSchema), authController.changePassword);
 
 module.exports = router;

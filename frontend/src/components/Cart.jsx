@@ -1,29 +1,14 @@
 import React from 'react';
 import { FaTrash, FaWhatsapp } from 'react-icons/fa';
+import { calculateFinalPrice, formatPrice, hasActiveDiscount } from '../utils/priceUtils';
 
 // --- CONFIGURAÇÃO ---
 const PHONE_NUMBER = '5511999999999'; 
 
 const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
-    
-    // Função auxiliar para calcular preço com desconto
-    const calculateDiscountedPrice = (item) => {
-        const hasDiscount = item.has_discount === true || item.has_discount === 1;
-        const discountPercentage = Number(item.discount_percentage) || 0;
-        
-        if (hasDiscount && discountPercentage > 0) {
-            // Use sale_price as base price, fallback to price for compatibility
-            const basePrice = Number(item.sale_price || item.price);
-            return basePrice * (1 - discountPercentage / 100);
-        }
-        
-        // Use sale_price as base price, fallback to price for compatibility
-        return Number(item.sale_price || item.price);
-    };
-
-    // Cálculo do total usando preço com desconto quando aplicável
+    // Cálculo do total usando utilitário centralizado
     const total = cartItems.reduce((acc, item) => {
-        const finalPrice = calculateDiscountedPrice(item);
+        const finalPrice = calculateFinalPrice(item);
         return acc + (finalPrice * item.quantity);
     }, 0);
 
@@ -42,25 +27,24 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                 message += `Tam: ${item.selectedSize}\n`;
             }
             
-            // Verifica se há desconto
-            const hasDiscount = item.has_discount === true || item.has_discount === 1;
-            const discountPercentage = Number(item.discount_percentage) || 0;
+            // Verifica se há desconto usando utilitário
+            const hasDiscount = hasActiveDiscount(item.has_discount, item.discount_percentage);
             
-            if (hasDiscount && discountPercentage > 0) {
-                const originalPrice = Number(item.price);
-                const discountedPrice = calculateDiscountedPrice(item);
+            if (hasDiscount) {
+                const originalPrice = Number(item.sale_price || item.price);
+                const discountedPrice = calculateFinalPrice(item);
                 
-                message += `Preço Original: R$ ${originalPrice.toFixed(2).replace('.', ',')}\n`;
-                message += `Desconto: ${discountPercentage}%\n`;
-                message += `Preço com Desconto: R$ ${discountedPrice.toFixed(2).replace('.', ',')}\n`;
+                message += `Preço Original: ${formatPrice(originalPrice)}\n`;
+                message += `Desconto: ${item.discount_percentage}%\n`;
+                message += `Preço com Desconto: ${formatPrice(discountedPrice)}\n`;
             } else {
-                message += `Preço Unit.: R$ ${Number(item.price).toFixed(2).replace('.', ',')}\n`;
+                message += `Preço Unit.: ${formatPrice(item.sale_price || item.price)}\n`;
             }
             
             message += `------------------------------\n`;
         });
 
-        message += `\n*TOTAL DO PEDIDO: R$ ${total.toFixed(2).replace('.', ',')}*`;
+        message += `\n*TOTAL DO PEDIDO: ${formatPrice(total)}*`;
         message += `\n\nAguardo as instruções para pagamento!`;
 
         const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -111,28 +95,25 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                                         </div>
                                         <div className="price">
                                             {(() => {
-                                                const hasDiscount = item.has_discount === true || item.has_discount === 1;
-                                                const discountPercentage = Number(item.discount_percentage) || 0;
+                                                const hasDiscount = hasActiveDiscount(item.has_discount, item.discount_percentage);
                                                 
-                                                if (hasDiscount && discountPercentage > 0) {
-                                                    // Use sale_price as original price, fallback to price for compatibility
+                                                if (hasDiscount) {
                                                     const originalPrice = Number(item.sale_price || item.price);
-                                                    const discountedPrice = calculateDiscountedPrice(item);
+                                                    const discountedPrice = calculateFinalPrice(item);
                                                     
                                                     return (
                                                         <>
                                                             <div className="old-price-card">
-                                                                R$ {originalPrice.toFixed(2).replace('.', ',')}
+                                                                {formatPrice(originalPrice)}
                                                             </div>
                                                             <div className="discounted-price">
-                                                                R$ {discountedPrice.toFixed(2).replace('.', ',')}
+                                                                {formatPrice(discountedPrice)}
                                                             </div>
                                                         </>
                                                     );
                                                 }
                                                 
-                                                // Use sale_price as base price, fallback to price for compatibility
-                                                return `R$ ${Number(item.sale_price || item.price).toFixed(2).replace('.', ',')}`;
+                                                return formatPrice(item.sale_price || item.price);
                                             })()}
                                         </div>
                                     </div>
@@ -145,7 +126,7 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                 <div className="cart-footer">
                     <div className="total-row">
                         <span>Total do Pedido:</span>
-                        <strong>R$ {total.toFixed(2).replace('.', ',')}</strong>
+                        <strong>{formatPrice(total)}</strong>
                     </div>
                     {/* Botão conectado à função de WhatsApp */}
                     <button className="btn-whatsapp" onClick={handleFinalizeWhatsapp}>

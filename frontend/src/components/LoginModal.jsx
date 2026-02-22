@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import BaseModal from './BaseModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
 
 function LoginModal({ isOpen, onClose, onLoginSuccess }) {
@@ -39,8 +39,6 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
         }
     };
 
-    if (!isOpen) return null;
-
     if (showForgotPassword) {
         return (
             <ForgotPasswordModal
@@ -54,53 +52,51 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content login-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>
-                    <FaTimes />
+        <BaseModal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Login"
+            className="login-modal"
+            size="small"
+        >
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="seu@email.com"
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label>Senha</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                    />
+                </div>
+
+                {error && <div className="error-message">{error}</div>}
+
+                <button type="submit" className="btn-submit" disabled={loading}>
+                    {loading ? 'Entrando...' : 'Entrar'}
                 </button>
-                
-                <h2>Login</h2>
-                
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="seu@email.com"
-                            required
-                        />
-                    </div>
 
-                    <div className="form-group">
-                        <label>Senha</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                        />
-                    </div>
-
-                    {error && <div className="error-message">{error}</div>}
-
-                    <button type="submit" className="btn-submit" disabled={loading}>
-                        {loading ? 'Entrando...' : 'Entrar'}
-                    </button>
-
-                    <button 
-                        type="button" 
-                        className="btn-forgot-password" 
-                        onClick={() => setShowForgotPassword(true)}
-                    >
-                        Esqueci minha senha
-                    </button>
-                </form>
-            </div>
-        </div>
+                <button 
+                    type="button" 
+                    className="btn-forgot-password" 
+                    onClick={() => setShowForgotPassword(true)}
+                >
+                    Esqueci minha senha
+                </button>
+            </form>
+        </BaseModal>
     );
 }
 

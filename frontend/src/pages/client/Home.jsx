@@ -5,12 +5,14 @@ import ProductCard from '../../components/ProductCard';
 import Pagination from '../../components/Pagination';
 import Modal from '../../components/Modal';
 import { storeSvc } from '../../services/api';
+import { useCache } from '../../contexts/CacheContext';
 
 function Home({ onOpenCart, addToCart }) {
     const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const { getCached, invalidatePattern } = useCache();
 
     // Estado dos filtros seguindo o padrão do seu backend
     const [filters, setFilters] = useState({
@@ -37,13 +39,23 @@ function Home({ onOpenCart, addToCart }) {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                // Aqui usamos o storeSvc.list que você mencionou que funciona
-                const res = await storeSvc.list(filters);
+                // Criar chave de cache baseada nos filtros
+                const cacheKey = `products_${JSON.stringify(filters)}`;
                 
-                if (res.data) {
-                    // Mapeamento direto do seu storeController: { data: products, pagination: {...} }
-                    setProducts(res.data.data || []);
-                    setPaginationData(res.data.pagination || { totalPages: 1 });
+                // Usar cache com TTL de 2 minutos para produtos
+                const data = await getCached(
+                    cacheKey,
+                    async () => {
+                        const res = await storeSvc.list(filters);
+                        return res.data; // Retornar apenas os dados
+                    },
+                    120000, // 2 minutos
+                    false // Não usar localStorage para produtos (dados dinâmicos)
+                );
+                
+                if (data) {
+                    setProducts(data.data || []);
+                    setPaginationData(data.pagination || { totalPages: 1 });
                 }
             } catch (error) {
                 console.error("Erro ao carregar produtos na Home:", error);
@@ -55,10 +67,13 @@ function Home({ onOpenCart, addToCart }) {
 
         fetchProducts();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [filters]);
+    }, [filters, getCached]);
 
     // Função de atualização de filtros vinda da Sidebar
     const handleFilterChange = (newFilters) => {
+        // Invalidar cache de produtos ao mudar filtros
+        invalidatePattern('products_');
+        
         // Se for um reset (botão limpar), voltamos ao estado inicial
         if (Object.keys(newFilters).length === 1 && newFilters.page === 1) {
             setFilters({

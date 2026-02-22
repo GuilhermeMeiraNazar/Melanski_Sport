@@ -1,53 +1,27 @@
 import React from 'react';
 import { FaShoppingCart, FaHeart, FaEye } from 'react-icons/fa';
+import { calculateDiscountedPrice, hasActiveDiscount, formatPrice } from '../utils/priceUtils';
+import { isOutOfStock } from '../utils/stockUtils';
+import LazyImage from './LazyImage';
 
 function ProductCard({ product, handleProductClick }) {
     // URL base da sua API
     const API_URL = 'http://localhost:3000'; 
 
     // LÓGICA DE IMAGEM
-    // Verifica se existe imagem, se é link externo ou local
     const mainImage = product.images && product.images.length > 0 
         ? (product.images[0].startsWith('http') ? product.images[0] : `${API_URL}${product.images[0]}`)
         : null;
 
-    // LÓGICA DE PREÇO (Item 2 e 5)
-    // Use sale_price as base price, fallback to price for compatibility
+    // LÓGICA DE PREÇO - Usando utilitários centralizados
     const basePrice = Number(product.sale_price || product.price);
-    
-    // Check if product has active discount
-    // has_discount can be boolean or number (1/0 from MySQL)
-    const hasActiveDiscount = (product.has_discount === true || product.has_discount === 1) 
-                              && product.discount_percentage > 0;
-    
-    // Calculate discounted price if discount is active
-    const discountedPrice = hasActiveDiscount 
-        ? basePrice * (1 - product.discount_percentage / 100)
+    const hasDiscount = hasActiveDiscount(product.has_discount, product.discount_percentage);
+    const displayPrice = hasDiscount 
+        ? calculateDiscountedPrice(basePrice, product.discount_percentage, product.has_discount)
         : basePrice;
-    
-    // Determine which price to display
-    const displayPrice = hasActiveDiscount ? discountedPrice : basePrice;
 
-    // LÓGICA DE ESTOQUE
-    // Verifica se o produto está esgotado
-    const isOutOfStock = () => {
-        // Se sizes é um array, verifica se está vazio
-        if (Array.isArray(product.sizes)) {
-            return product.sizes.length === 0;
-        }
-        // Se stock é um objeto, verifica se todos os valores são 0
-        if (typeof product.stock === 'object' && product.stock !== null) {
-            return Object.values(product.stock).every(qty => qty === 0);
-        }
-        // Se stock é um número, verifica se é 0
-        if (typeof product.stock === 'number') {
-            return product.stock === 0;
-        }
-        // Por padrão, considera que tem estoque
-        return false;
-    };
-
-    const outOfStock = isOutOfStock();
+    // LÓGICA DE ESTOQUE - Usando utilitário centralizado
+    const outOfStock = isOutOfStock(product.stock, product.sizes);
 
     // Função para lidar com o clique - bloqueia se estiver esgotado
     const handleClick = () => {
@@ -61,14 +35,14 @@ function ProductCard({ product, handleProductClick }) {
             {/* BADGES (Item 1 - Ícone verde para lançamentos) */}
             <div className="product-badges">
                 {outOfStock && <span className="badge-out-of-stock">ESGOTADO</span>}
-                {!outOfStock && hasActiveDiscount && <span className="badge-offer">OFERTA</span>}
+                {!outOfStock && hasDiscount && <span className="badge-offer">OFERTA</span>}
                 {!outOfStock && product.isLaunch && <span className="badge-new">NOVO</span>}
             </div>
             
             {/* IMAGEM */}
             <div className="image-container">
                 {mainImage ? (
-                    <img 
+                    <LazyImage 
                         src={mainImage} 
                         alt={product.name} 
                         className="product-img"
@@ -88,17 +62,15 @@ function ProductCard({ product, handleProductClick }) {
                     <h3>{product.name}</h3>
                 </div>
                 
-                {/* Lógica de Preço (Item 2, 3 e 5) */}
+                {/* Lógica de Preço */}
                 <div className="price-row">
-                    {/* Preço de Venda (Se desconto ativo, mostra preço com desconto. Se normal, mostra preço base) */}
                     <p className="price">
-                        R$ {displayPrice.toFixed(2).replace('.', ',')}
+                        {formatPrice(displayPrice)}
                     </p>
                     
-                    {/* Preço Riscado (Aparece APENAS se tiver desconto ativo) */}
-                    {hasActiveDiscount && (
+                    {hasDiscount && (
                         <span className="old-price-card">
-                            R$ {basePrice.toFixed(2).replace('.', ',')}
+                            {formatPrice(basePrice)}
                         </span>
                     )}
                 </div>

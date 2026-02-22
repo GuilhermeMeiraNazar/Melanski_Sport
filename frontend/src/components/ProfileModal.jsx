@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FaTimes, FaUser, FaLock, FaEnvelope, FaSave } from 'react-icons/fa';
+import { FaUser, FaLock, FaEnvelope, FaSave } from 'react-icons/fa';
+import BaseModal from './BaseModal';
 import { authSvc } from '../services/api';
 
 function ProfileModal({ user, onClose, onUpdate }) {
@@ -84,131 +85,130 @@ function ProfileModal({ user, onClose, onUpdate }) {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="profile-modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>
-                    <FaTimes />
+        <BaseModal
+            isOpen={true}
+            onClose={onClose}
+            className="profile-modal"
+            size="medium"
+        >
+            <div className="profile-modal-header">
+                <h2>Minha Conta</h2>
+                <p>Gerencie suas informações pessoais</p>
+            </div>
+
+            <div className="profile-tabs">
+                <button 
+                    className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('profile')}
+                >
+                    <FaUser /> Perfil
                 </button>
+                <button 
+                    className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('password')}
+                >
+                    <FaLock /> Senha
+                </button>
+            </div>
 
-                <div className="profile-modal-header">
-                    <h2>Minha Conta</h2>
-                    <p>Gerencie suas informações pessoais</p>
-                </div>
+            <div className="profile-modal-body">
+                {activeTab === 'profile' ? (
+                    <form onSubmit={handleUpdateProfile}>
+                        <div className="form-group">
+                            <label>
+                                <FaUser /> Nome Completo
+                            </label>
+                            <input
+                                type="text"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                placeholder="Seu nome completo"
+                                required
+                            />
+                        </div>
 
-                <div className="profile-tabs">
-                    <button 
-                        className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('profile')}
-                    >
-                        <FaUser /> Perfil
-                    </button>
-                    <button 
-                        className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('password')}
-                    >
-                        <FaLock /> Senha
-                    </button>
-                </div>
+                        <div className="form-group">
+                            <label>
+                                <FaEnvelope /> Email
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="seu@email.com"
+                                required
+                            />
+                            <small>Ao alterar o email, você precisará verificá-lo novamente</small>
+                        </div>
 
-                <div className="profile-modal-body">
-                    {activeTab === 'profile' ? (
-                        <form onSubmit={handleUpdateProfile}>
+                        {user.role !== 'client' && (
                             <div className="form-group">
-                                <label>
-                                    <FaUser /> Nome Completo
-                                </label>
+                                <label>Cargo</label>
                                 <input
                                     type="text"
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    placeholder="Seu nome completo"
-                                    required
+                                    value={user.role}
+                                    disabled
+                                    style={{ background: '#f5f5f5', cursor: 'not-allowed' }}
                                 />
+                                <small>O cargo não pode ser alterado</small>
                             </div>
+                        )}
 
-                            <div className="form-group">
-                                <label>
-                                    <FaEnvelope /> Email
-                                </label>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="seu@email.com"
-                                    required
-                                />
-                                <small>Ao alterar o email, você precisará verificá-lo novamente</small>
-                            </div>
+                        <button type="submit" className="btn-save" disabled={loading}>
+                            <FaSave /> {loading ? 'Salvando...' : 'Salvar Alterações'}
+                        </button>
+                    </form>
+                ) : (
+                    <form onSubmit={handleChangePassword}>
+                        <div className="form-group">
+                            <label>
+                                <FaLock /> Senha Atual
+                            </label>
+                            <input
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                placeholder="Digite sua senha atual"
+                                required
+                            />
+                        </div>
 
-                            {user.role !== 'client' && (
-                                <div className="form-group">
-                                    <label>Cargo</label>
-                                    <input
-                                        type="text"
-                                        value={user.role}
-                                        disabled
-                                        style={{ background: '#f5f5f5', cursor: 'not-allowed' }}
-                                    />
-                                    <small>O cargo não pode ser alterado</small>
-                                </div>
-                            )}
+                        <div className="form-group">
+                            <label>
+                                <FaLock /> Nova Senha
+                            </label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Digite a nova senha"
+                                required
+                                minLength="6"
+                            />
+                            <small>Mínimo de 6 caracteres</small>
+                        </div>
 
-                            <button type="submit" className="btn-save" disabled={loading}>
-                                <FaSave /> {loading ? 'Salvando...' : 'Salvar Alterações'}
-                            </button>
-                        </form>
-                    ) : (
-                        <form onSubmit={handleChangePassword}>
-                            <div className="form-group">
-                                <label>
-                                    <FaLock /> Senha Atual
-                                </label>
-                                <input
-                                    type="password"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    placeholder="Digite sua senha atual"
-                                    required
-                                />
-                            </div>
+                        <div className="form-group">
+                            <label>
+                                <FaLock /> Confirmar Nova Senha
+                            </label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Confirme a nova senha"
+                                required
+                                minLength="6"
+                            />
+                        </div>
 
-                            <div className="form-group">
-                                <label>
-                                    <FaLock /> Nova Senha
-                                </label>
-                                <input
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="Digite a nova senha"
-                                    required
-                                    minLength="6"
-                                />
-                                <small>Mínimo de 6 caracteres</small>
-                            </div>
-
-                            <div className="form-group">
-                                <label>
-                                    <FaLock /> Confirmar Nova Senha
-                                </label>
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Confirme a nova senha"
-                                    required
-                                    minLength="6"
-                                />
-                            </div>
-
-                            <button type="submit" className="btn-save" disabled={loading}>
-                                <FaSave /> {loading ? 'Alterando...' : 'Alterar Senha'}
-                            </button>
-                        </form>
-                    )}
-                </div>
+                        <button type="submit" className="btn-save" disabled={loading}>
+                            <FaSave /> {loading ? 'Alterando...' : 'Alterar Senha'}
+                        </button>
+                    </form>
+                )}
             </div>
-        </div>
+        </BaseModal>
     );
 }
 

@@ -1,8 +1,8 @@
 const db = require('../config/database');
+const { asyncHandler } = require('../middleware/errorHandler');
 
 const storeController = {
-    listProducts: async (req, res) => {
-        try {
+    listProducts: asyncHandler(async (req, res) => {
             const { 
                 page = 1, 
                 limit = 12, 
@@ -143,31 +143,69 @@ const storeController = {
                     totalPages: Math.ceil(totalItems / intLimit)
                 }
             });
+    }),
 
-        } catch (error) {
-            console.error("Erro no storeController.listProducts:", error);
-            res.status(500).json({ error: 'Erro ao buscar produtos da loja' });
-        }
-    },
+    getSidebarOptions: asyncHandler(async (req, res) => {
+        // Buscar apenas times de produtos que existem e têm estoque
+        const [teams] = await db.execute(`
+            SELECT DISTINCT p.team 
+            FROM products p 
+            INNER JOIN product_inventory inv ON p.id = inv.product_id 
+            WHERE p.team IS NOT NULL 
+            AND p.team != "" 
+            AND inv.quantity > 0 
+            ORDER BY p.team ASC
+        `);
+        
+        // Buscar apenas categorias de produtos que existem e têm estoque
+        const [categories] = await db.execute(`
+            SELECT DISTINCT pc.name 
+            FROM product_categories pc 
+            INNER JOIN products p ON p.category_id = pc.id 
+            INNER JOIN product_inventory inv ON p.id = inv.product_id 
+            WHERE inv.quantity > 0 
+            ORDER BY pc.name ASC
+        `);
+        
+        // Buscar apenas gêneros de produtos que existem e têm estoque
+        const [genders] = await db.execute(`
+            SELECT DISTINCT p.gender 
+            FROM products p 
+            INNER JOIN product_inventory inv ON p.id = inv.product_id 
+            WHERE p.gender IS NOT NULL 
+            AND p.gender != "" 
+            AND inv.quantity > 0 
+            ORDER BY p.gender ASC
+        `);
+        
+        // Buscar apenas tamanhos com estoque disponível
+        const [sizes] = await db.execute(`
+            SELECT DISTINCT inv.size 
+            FROM product_inventory inv 
+            WHERE inv.quantity > 0 
+            AND inv.size IS NOT NULL 
+            AND inv.size != "" 
+            ORDER BY 
+                CASE inv.size
+                    WHEN 'PP' THEN 1
+                    WHEN 'P' THEN 2
+                    WHEN 'M' THEN 3
+                    WHEN 'G' THEN 4
+                    WHEN 'GG' THEN 5
+                    WHEN 'XG' THEN 6
+                    WHEN 'XGG' THEN 7
+                    ELSE 8
+                END,
+                inv.size ASC
+        `);
 
-    getSidebarOptions: async (req, res) => {
-        try {
-            const [teams] = await db.execute('SELECT DISTINCT team FROM products WHERE team IS NOT NULL AND team != "" ORDER BY team ASC');
-            const [categories] = await db.execute('SELECT DISTINCT pc.name FROM product_categories pc INNER JOIN products p ON p.category_id = pc.id ORDER BY pc.name ASC');
-            const [genders] = await db.execute('SELECT DISTINCT gender FROM products WHERE gender IS NOT NULL AND gender != ""');
-            const [sizes] = await db.execute('SELECT DISTINCT size FROM product_inventory WHERE quantity > 0 ORDER BY size ASC');
-
-            res.json({
-                times: teams.map(t => t.team),
-                tipos: categories.map(c => c.name),
-                generos: genders.map(g => g.gender),
-                tamanhos: sizes.map(s => s.size).filter(s => s !== 'Geral' && s !== 'Único')
-            });
-        } catch (error) {
-            console.error("Erro no storeController.getSidebarOptions:", error);
-            res.status(500).json({ error: 'Erro ao carregar filtros' });
-        }
-    }
+        res.json({
+            times: teams.map(t => t.team),
+            tipos: categories.map(c => c.name),
+            generos: genders.map(g => g.gender),
+            tamanhos: sizes.map(s => s.size).filter(s => s !== 'Geral' && s !== 'Único')
+        });
+    })
 };
 
 module.exports = storeController;

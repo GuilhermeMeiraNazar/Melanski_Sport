@@ -1,3 +1,4 @@
+/* _login-modal.scss - Extends base modal styles */
 .login-modal {
     max-width: 400px;
     padding: 30px;
@@ -22,9 +23,9 @@
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: $radius-small;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: border-color $transition-normal;
 
             &:focus {
                 outline: none;
@@ -34,10 +35,10 @@
     }
 
     .error-message {
-        background: #fee;
-        color: #c33;
+        background: $color-error-bg;
+        color: $color-error;
         padding: 10px;
-        border-radius: 6px;
+        border-radius: $radius-small;
         margin-bottom: 15px;
         font-size: 14px;
         text-align: center;
@@ -49,11 +50,11 @@
         background: $vermelho-principal;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: $radius-small;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: background $transition-normal;
         margin-bottom: 10px;
 
         &:hover:not(:disabled) {
@@ -75,7 +76,7 @@
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all $transition-normal;
         text-decoration: underline;
 
         &:hover {

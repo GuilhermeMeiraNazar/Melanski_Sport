@@ -13,6 +13,31 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Interceptor para tratamento centralizado de erros
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // Tratamento de erros de autenticação
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+        
+        // Tratamento de erros de permissão
+        if (error.response?.status === 403) {
+            console.error('Acesso negado:', error.response.data);
+        }
+        
+        // Tratamento de erros de servidor
+        if (error.response?.status >= 500) {
+            console.error('Erro no servidor:', error.response.data);
+        }
+        
+        return Promise.reject(error);
+    }
+);
+
 // --- SERVIÇO DE AUTENTICAÇÃO ---
 export const authSvc = {
     login: (email, password) => api.post('/auth/login', { email, password }),
