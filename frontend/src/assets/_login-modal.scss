@@ -54,6 +54,7 @@
         font-weight: 600;
         cursor: pointer;
         transition: background 0.3s;
+        margin-bottom: 10px;
 
         &:hover:not(:disabled) {
             background: darken($vermelho-principal, 10%);
@@ -62,6 +63,24 @@
         &:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+    }
+
+    .btn-forgot-password {
+        width: 100%;
+        padding: 10px;
+        background: transparent;
+        color: $vermelho-principal;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: underline;
+
+        &:hover {
+            color: darken($vermelho-principal, 10%);
+            transform: translateY(-1px);
         }
     }
 }

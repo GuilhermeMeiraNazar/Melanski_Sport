@@ -1,25 +1,127 @@
-/* _pagination.scss */
+/* _pagination.scss - Modernizado */
 
 .pagination {
-    margin-top: 40px;
+    margin-top: 50px;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    
     .page-control {
-        background-color: $branco;
-        border: 1px solid #ddd;
-        padding: 10px 18px;
-        border-radius: 30px;
+        background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+        border: 2px solid #e8e8e8;
+        padding: 12px 20px;
+        border-radius: 10px;
         cursor: pointer;
         display: flex;
         align-items: center;
+        gap: 6px;
+        font-weight: 700;
+        color: #333;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        min-width: 45px;
+        justify-content: center;
+        
         &:hover:not(:disabled) {
-            background-color: $preto;
+            background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
             color: $branco;
+            border-color: $preto;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
+        
+        &:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        
         &:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+        }
+
+        &.active {
+            background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
+            color: $branco;
+            border-color: $vermelho-principal;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+        }
+    }
+
+    .page-number {
+        background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+        border: 2px solid #e8e8e8;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        color: #666;
+        transition: all 0.3s;
+        min-width: 45px;
+        text-align: center;
+
+        &:hover {
+            background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
+            color: $branco;
+            border-color: $preto;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        &.active {
+            background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
+            color: $branco;
+            border-color: $vermelho-principal;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+            transform: translateY(-2px);
+        }
+    }
+}
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+    .pagination {
+        margin-top: 35px;
+        gap: 8px;
+        padding: 15px 0;
+
+        .page-control {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            min-width: 40px;
+        }
+
+        .page-number {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            min-width: 40px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        margin-top: 30px;
+        gap: 6px;
+
+        .page-control {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            min-width: 36px;
+
+            span {
+                display: none; /* Esconde texto, mostra só ícones */
+            }
+        }
+
+        .page-number {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            min-width: 36px;
         }
     }
 }

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,6 +40,18 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     };
 
     if (!isOpen) return null;
+
+    if (showForgotPassword) {
+        return (
+            <ForgotPasswordModal
+                onClose={() => {
+                    setShowForgotPassword(false);
+                    onClose();
+                }}
+                onSuccess={() => setShowForgotPassword(false)}
+            />
+        );
+    }
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -75,6 +89,14 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
                     <button type="submit" className="btn-submit" disabled={loading}>
                         {loading ? 'Entrando...' : 'Entrar'}
+                    </button>
+
+                    <button 
+                        type="button" 
+                        className="btn-forgot-password" 
+                        onClick={() => setShowForgotPassword(true)}
+                    >
+                        Esqueci minha senha
                     </button>
                 </form>
             </div>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { FaUserAlt, FaShoppingCart, FaUserShield } from 'react-icons/fa';
+import { FaUserAlt, FaShoppingCart, FaUserShield, FaCog } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from './LoginModal';
+import ProfileModal from './ProfileModal';
 
 function Header({ onOpenCart, cartCount }) {
     const [loginModalOpen, setLoginModalOpen] = useState(false);
+    const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem('user');
         return savedUser ? JSON.parse(savedUser) : null;
@@ -21,6 +23,10 @@ function Header({ onOpenCart, cartCount }) {
         setUser(null);
     };
 
+    const handleProfileUpdate = (updatedUser) => {
+        setUser(updatedUser);
+    };
+
     const canAccessAdmin = user && ['developer', 'administrator', 'operator'].includes(user.role);
 
     return (
@@ -29,7 +35,7 @@ function Header({ onOpenCart, cartCount }) {
                 <div className="top-bar">
                     <p>🔥 FRETE GRÁTIS ACIMA DE R$ 299 🔥</p>
                     <div className="top-links">
-                        {user ? (
+                        {user && (
                             <>
                                 <span className="user-greeting">Olá, {user.full_name}</span>
                                 {canAccessAdmin && (
@@ -44,10 +50,6 @@ function Header({ onOpenCart, cartCount }) {
                                     Sair
                                 </button>
                             </>
-                        ) : (
-                            <span onClick={() => setLoginModalOpen(true)} style={{ cursor: 'pointer' }}>
-                                <FaUserAlt /> Minha Conta
-                            </span>
                         )}
                     </div>
                 </div>
@@ -57,7 +59,17 @@ function Header({ onOpenCart, cartCount }) {
                             <h1>Melanski<span>Sports</span></h1>
                         </div>
                         <div className="header-icons">
-                            <div className="cart-icon" onClick={onOpenCart}>
+                            {/* Ícone Minha Conta / Perfil */}
+                            <div 
+                                className="account-icon" 
+                                onClick={() => user ? setProfileModalOpen(true) : setLoginModalOpen(true)} 
+                                title={user ? 'Meu Perfil' : 'Minha Conta'}
+                            >
+                                {user ? <FaCog /> : <FaUserAlt />}
+                            </div>
+                            
+                            {/* Ícone Carrinho */}
+                            <div className="cart-icon" onClick={onOpenCart} title="Carrinho">
                                 <FaShoppingCart />
                                 {cartCount > 0 && (
                                     <span className="cart-count">{cartCount}</span>
@@ -73,6 +85,14 @@ function Header({ onOpenCart, cartCount }) {
                 onClose={() => setLoginModalOpen(false)}
                 onLoginSuccess={handleLoginSuccess}
             />
+
+            {user && profileModalOpen && (
+                <ProfileModal
+                    user={user}
+                    onClose={() => setProfileModalOpen(false)}
+                    onUpdate={handleProfileUpdate}
+                />
+            )}
         </>
     );
 }

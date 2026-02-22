@@ -238,6 +238,209 @@ const authController = {
             valid: true, 
             user: req.user 
         });
+    },
+
+    updateProfile: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const { full_name, email } = req.body;
+
+            if (!full_name && !email) {
+                return res.status(400).json({ error: 'Nenhum campo para atualizar' });
+            }
+
+            // Se estiver mudando o email, verificar se já existe
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    return res.status(400).json({ error: 'Email inválido' });
+                }
+
+                const [existing] = await db.execute(
+                    'SELECT id FROM users WHERE email = ? AND id != ?',
+                    [email, userId]
+                );
+
+                if (existing.length > 0) {
+                    return res.status(409).json({ error: 'Email já está em uso' });
+                }
+            }
+
+            // Construir query dinamicamente
+            const updates = [];
+            const values = [];
+
+            if (full_name) {
+                updates.push('full_name = ?');
+                values.push(full_name);
+            }
+
+            if (email) {
+                updates.push('email = ?');
+                values.push(email);
+                // Se mudar email, marcar como não verificado
+                updates.push('email_verified = 0');
+            }
+
+            values.push(userId);
+
+            await db.execute(
+                `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+                values
+            );
+
+            // Buscar dados atualizados
+            const [users] = await db.execute(
+                'SELECT id, full_name, email, role, email_verified FROM users WHERE id = ?',
+                [userId]
+            );
+
+            res.json({
+                message: 'Perfil atualizado com sucesso!',
+                user: users[0]
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar perfil:', error);
+            res.status(500).json({ error: 'Erro ao atualizar perfil' });
+        }
+    },
+
+    changePassword: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const { currentPassword, newPassword } = req.body;
+
+            if (!currentPassword || !newPassword) {
+                return res.status(400).json({ error: 'Senha atual e nova senha são obrigatórias' });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({ error: 'Nova senha deve ter no mínimo 6 caracteres' });
+            }
+
+            // Buscar usuário
+            const [users] = await db.execute(
+                'SELECT password_hash FROM users WHERE id = ?',
+                [userId]
+            );
+
+            if (users.length === 0) {
+                return res.status(404).json({ error: 'Usuário não encontrado' });
+            }
+
+            // Verificar senha atual
+            const isPasswordValid = await bcrypt.compare(currentPassword, users[0].password_hash);
+
+            if (!isPasswordValid) {
+                return res.status(401).json({ error: 'Senha atual incorreta' });
+            }
+
+            // Hash da nova senha
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            // Atualizar senha
+            await db.execute(
+                'UPDATE users SET password_hash = ? WHERE id = ?',
+                [hashedPassword, userId]
+            );
+
+            res.json({ message: 'Senha alterada com sucesso!' });
+        } catch (error) {
+            console.error('Erro ao alterar senha:', error);
+            res.status(500).json({ error: 'Erro ao alterar senha' });
+        }
+    },
+
+    requestPasswordReset: async (req, res) => {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res.status(400).json({ error: 'Email é obrigatório' });
+            }
+
+            const [users] = await db.execute(
+                'SELECT * FROM users WHERE email = ?',
+                [email]
+            );
+
+            // Por segurança, sempre retorna sucesso mesmo se o email não existir
+            if (users.length === 0) {
+                return res.json({ message: 'Se o email existir, você receberá instruções para resetar a senha' });
+            }
+
+            const user = users[0];
+
+            // Gerar código de recuperação
+            const resetCode = generateVerificationCode();
+            const codeExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+
+            await db.execute(
+                `UPDATE users 
+                SET verification_code = ?, verification_code_expires = ? 
+                WHERE id = ?`,
+                [resetCode, codeExpires, user.id]
+            );
+
+            // Enviar email com código
+            try {
+                await sendVerificationEmail(email, user.full_name, resetCode);
+            } catch (emailError) {
+                console.error('Erro ao enviar email:', emailError);
+                return res.status(500).json({ error: 'Erro ao enviar email de recuperação' });
+            }
+
+            res.json({ message: 'Código de recuperação enviado para seu email' });
+        } catch (error) {
+            console.error('Erro ao solicitar reset de senha:', error);
+            res.status(500).json({ error: 'Erro ao processar solicitação' });
+        }
+    },
+
+    resetPassword: async (req, res) => {
+        try {
+            const { email, code, newPassword } = req.body;
+
+            if (!email || !code || !newPassword) {
+                return res.status(400).json({ error: 'Email, código e nova senha são obrigatórios' });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({ error: 'Nova senha deve ter no mínimo 6 caracteres' });
+            }
+
+            const [users] = await db.execute(
+                `SELECT * FROM users 
+                WHERE email = ? 
+                AND verification_code = ? 
+                AND verification_code_expires > NOW()`,
+                [email, code]
+            );
+
+            if (users.length === 0) {
+                return res.status(400).json({ error: 'Código inválido ou expirado' });
+            }
+
+            const user = users[0];
+
+            // Hash da nova senha
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            // Atualizar senha e limpar código
+            await db.execute(
+                `UPDATE users 
+                SET password_hash = ?, 
+                    verification_code = NULL, 
+                    verification_code_expires = NULL 
+                WHERE id = ?`,
+                [hashedPassword, user.id]
+            );
+
+            res.json({ message: 'Senha resetada com sucesso!' });
+        } catch (error) {
+            console.error('Erro ao resetar senha:', error);
+            res.status(500).json({ error: 'Erro ao resetar senha' });
+        }
     }
 };
 

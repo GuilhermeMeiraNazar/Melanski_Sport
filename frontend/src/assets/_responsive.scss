@@ -1,145 +1,315 @@
-/* _responsive.scss */
+/* _responsive.scss - Modernizado */
 
 /* --- ESCALA DE TEXTO (FLUID TYPOGRAPHY) --- */
 @media (max-width: 1024px) {
     html {
-        font-size: 93.75%; // Equivalente a 15px se base for 16px
+        font-size: 93.75%; // 15px
     }
     .product-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+}
+
+@media (max-width: 968px) {
+    .main-container {
+        flex-direction: column;
+        padding-top: 160px;
+        padding-bottom: 90px;
+    }
+    
+    .mobile-filter-btn { 
+        display: flex; 
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
     }
 }
 
 @media (max-width: 768px) {
     html {
-        font-size: 87.5%; // Equivalente a 14px - Todo texto do site diminui um pouco
+        font-size: 87.5%; // 14px
     }
 
     .main-container {
-        flex-direction: column;
-        padding-top: 100px; // Reduzido para ganhar espaço no mobile
+        padding-top: 150px;
         padding-left: 15px;
         padding-right: 15px;
-        padding-bottom: 80px; // Espaço extra no final
-    }
-    .mobile-filter-btn { display: flex; }
-    
-    /* Sidebar Gaveta */
-    .sidebar-filters {
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 85%;
-        height: 100vh;
-        max-height: 100vh;
-        z-index: 9999;
-        background: $branco;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding-top: 20px;
-        overflow-y: auto; // Garante scroll se o menu for alto
-        
-        &.open {
-            left: 0;
-        }
-        .filter-header .close-mobile { display: block; font-size: 1.5rem; padding: 5px; }
+        padding-bottom: 85px;
     }
     
-    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .product-grid { 
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
   
     .product-card {
-    .card-info {
-        padding: 10px;
+        .image-container {
+            height: 200px;
+        }
 
-        h3 {
-        font-size: 0.9rem;
-        height: auto;
-        min-height: 35px;
-        overflow: hidden;
+        .card-info {
+            padding: 12px;
 
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
+            h3 {
+                font-size: 0.85rem;
+                min-height: 36px;
+            }
 
-        -webkit-line-clamp: 2;
-        line-clamp: 2; // versão padrão
+            .price-row {
+                .price {
+                    font-size: 1.1rem;
+                }
+
+                .old-price-card {
+                    font-size: 0.75rem;
+                }
+            }
         }
     }
-    }
-    /* --- ADAPTAÇÃO DO MODAL PARA MOBILE --- */
-    .modal-overlay { padding: 0; align-items: flex-end; }
-    .modal-content { height: 90vh; max-height: 90vh; border-radius: 16px 16px 0 0; }
     
-    .modal-body-grid { display: flex; flex-direction: column; overflow-y: auto; height: 100%; }
+    /* --- MODAL MOBILE --- */
+    .modal-overlay { 
+        padding: 0; 
+        align-items: flex-end; 
+    }
+    
+    .modal-content { 
+        height: 92vh; 
+        max-height: 92vh; 
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-body-grid { 
+        display: flex; 
+        flex-direction: column; 
+        overflow-y: auto; 
+        height: 100%; 
+    }
     
     .modal-content .modal-close {
         position: absolute; 
-        top: 10px; 
-        right: 10px; 
-        left: auto;
-        background: rgba(0,0,0,0.1); 
-        width: 30px; 
-        height: 30px; 
+        top: 12px; 
+        right: 12px; 
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+        width: 36px; 
+        height: 36px; 
         border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
         z-index: 10;
+        color: #333;
+        font-size: 1.3rem;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(220, 20, 60, 0.9);
+            color: $branco;
+        }
     }
     
     .modal-gallery { 
         padding: 0; 
-        background-color: #f5f5f5;
-        min-height: 300px;
+        background: linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%);
+        min-height: 320px;
         
         .main-photo-frame { 
-            height: 300px; 
+            height: 320px; 
             border: none; 
             border-radius: 0;
-            background-color: $branco;
-            img { object-fit: contain; }
+            background: $branco;
+            padding: 15px;
+            
+            img { 
+                object-fit: contain; 
+            }
         }
         
         .thumbnails-scroll { 
-            display: flex; // Mostra as thumbnails no mobile
-            padding: 10px;
-            gap: 8px;
+            display: flex;
+            padding: 12px;
+            gap: 10px;
             justify-content: flex-start;
-            overflow-x: auto; // Permite scroll horizontal
+            overflow-x: auto;
             overflow-y: hidden;
             
-            // Estilo de scrollbar mais bonito
             &::-webkit-scrollbar {
-                height: 4px;
+                height: 5px;
             }
+            
+            &::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.05);
+            }
+            
             &::-webkit-scrollbar-thumb {
-                background-color: rgba(0,0,0,0.2);
-                border-radius: 2px;
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 3px;
+                
+                &:hover {
+                    background: rgba(220, 20, 60, 0.5);
+                }
             }
             
             .thumb-item {
-                flex-shrink: 0; // Impede que as thumbnails encolham
+                flex-shrink: 0;
+                width: 65px;
+                height: 65px;
             }
         }
     }
     
     .modal-details {
         border-left: none; 
-        margin-top: 0; 
-        border-radius: 0;
-        position: relative; 
+        border-top: 1px solid #e6e6e6;
+        padding: 25px 20px;
         background: $branco;
-        box-shadow: none;
-        padding: 20px;
-        min-height: auto;
+
+        .product-header-info h1 {
+            font-size: 1.3rem;
+        }
+
+        .price-section {
+            .current-price-row {
+                .currency { font-size: 1.2rem; }
+                .value { font-size: 2rem; }
+                .cents { font-size: 1rem; }
+            }
+        }
+
+        .variations-section {
+            .size-selector {
+                flex-wrap: wrap;
+                gap: 8px;
+
+                .size-opt {
+                    padding: 10px 16px;
+                    font-size: 0.9rem;
+                }
+            }
+        }
+
+        .action-buttons {
+            button {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+        }
     }
 }
 
 @media (max-width: 480px) {
+    html {
+        font-size: 81.25%; // 13px
+    }
+
+    .main-container {
+        padding-top: 140px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 80px;
+    }
+
     .product-grid {
-        // Se ficar muito apertado em telas mínimas (iPhone SE antigo), mude para 1 coluna ou ajuste gap
-        // grid-template-columns: 1fr; 
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .product-card {
+        .image-container {
+            height: 180px;
+        }
+
+        .card-info {
+            padding: 10px;
+
+            h3 {
+                font-size: 0.8rem;
+            }
+
+            .price-row {
+                .price {
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+
+    .modal-gallery {
+        .main-photo-frame {
+            height: 280px;
+        }
+
+        .thumbnails-scroll {
+            .thumb-item {
+                width: 55px;
+                height: 55px;
+            }
+        }
+    }
+
+    .modal-details {
+        padding: 20px 15px;
+
+        .product-header-info h1 {
+            font-size: 1.2rem;
+        }
+
+        .price-section {
+            .current-price-row {
+                .currency { font-size: 1.1rem; }
+                .value { font-size: 1.8rem; }
+                .cents { font-size: 0.95rem; }
+            }
+        }
+    }
+}
+
+/* Telas muito pequenas (iPhone SE, etc) */
+@media (max-width: 360px) {
+    .main-container {
+        padding-top: 135px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
-    
-    .admin-header h1 {
-        font-size: 1.2rem;
+
+    .product-card {
+        .image-container {
+            height: 160px;
+        }
+
+        .card-info {
+            padding: 8px;
+
+            h3 {
+                font-size: 0.75rem;
+            }
+
+            .price-row {
+                .price {
+                    font-size: 0.95rem;
+                }
+            }
+        }
+    }
+}
+
+/* Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .modal-content {
+        height: 95vh;
+    }
+
+    .modal-gallery {
+        .main-photo-frame {
+            height: 200px;
+        }
     }
 }

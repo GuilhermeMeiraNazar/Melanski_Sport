@@ -1,44 +1,82 @@
-/* _footer.scss */
+/* _footer.scss - Modernizado */
 
 .footer {
-    background-color: $preto;
+    background: linear-gradient(180deg, #0a0a0a 0%, $preto 100%);
     color: $branco;
-    padding: 30px 20px;
-    margin-top: auto; // Empurra o footer para o final da página
+    padding: 40px 20px;
+    margin-top: auto;
     width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            $vermelho-principal 50%, 
+            transparent 100%
+        );
+    }
     
     .footer-content {
         max-width: 1200px;
         margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        align-items: start;
     }
     
     .footer-section {
-        flex: 1;
-        min-width: 200px;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         
         p {
             margin: 0;
             font-size: 0.9rem;
-            line-height: 1.6;
-            color: $branco;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            transition: color 0.3s;
         }
         
         .copyright {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: $branco;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+                content: '©';
+                font-size: 1.2rem;
+                color: $vermelho-principal;
+            }
         }
         
         .cnpj {
-            font-weight: 400;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid $vermelho-principal;
+            font-size: 0.85rem;
         }
         
         .address {
             font-weight: 400;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            padding-left: 12px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
         }
     }
 }
@@ -46,19 +84,38 @@
 /* Responsividade Mobile */
 @media (max-width: 768px) {
     .footer {
-        padding: 20px 15px;
+        padding: 30px 20px;
         
         .footer-content {
-            flex-direction: column;
+            grid-template-columns: 1fr;
+            gap: 25px;
             text-align: center;
-            gap: 15px;
         }
         
         .footer-section {
-            width: 100%;
+            align-items: center;
             
             p {
                 font-size: 0.85rem;
+            }
+
+            .copyright {
+                justify-content: center;
+                font-size: 0.9rem;
+            }
+
+            .cnpj {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                border-left: none;
+                border-bottom: 3px solid $vermelho-principal;
+            }
+
+            .address {
+                border-left: none;
+                padding-left: 0;
+                padding-top: 8px;
+                border-top: 2px solid rgba(255, 255, 255, 0.1);
             }
         }
     }
@@ -66,11 +123,27 @@
 
 @media (max-width: 480px) {
     .footer {
-        padding: 15px 10px;
+        padding: 25px 15px;
+        
+        .footer-content {
+            gap: 20px;
+        }
         
         .footer-section {
             p {
                 font-size: 0.8rem;
+            }
+
+            .copyright {
+                font-size: 0.85rem;
+            }
+
+            .cnpj {
+                font-size: 0.75rem;
+            }
+
+            .address {
+                font-size: 0.75rem;
             }
         }
     }

@@ -17,7 +17,11 @@ api.interceptors.request.use((config) => {
 export const authSvc = {
     login: (email, password) => api.post('/auth/login', { email, password }),
     register: (data) => api.post('/auth/register', data),
-    validate: () => api.get('/auth/validate')
+    validate: () => api.get('/auth/validate'),
+    updateProfile: (data) => api.put('/auth/profile', data),
+    changePassword: (data) => api.put('/auth/change-password', data),
+    requestPasswordReset: (email) => api.post('/auth/request-password-reset', { email }),
+    resetPassword: (data) => api.post('/auth/reset-password', data)
 };
 
 // --- SERVIÇO DE CATEGORIAS ---

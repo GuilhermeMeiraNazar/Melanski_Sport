@@ -1,18 +1,50 @@
-/* _layout.scss */
+/* _layout.scss - Modernizado */
 
 .main-container {
     display: flex;
     max-width: 1300px;
     margin: 0 auto;
     padding-top: 160px;
-    padding-bottom: 40px;
+    padding-bottom: 50px;
     padding-left: 20px;
     padding-right: 20px;
-    gap: 30px;
+    gap: 35px;
     position: relative;
     min-height: 100vh;
 }
 
 .content-area {
     flex: 1;
+    min-width: 0; /* Previne overflow em flex items */
+}
+
+/* Responsividade */
+@media (max-width: 968px) {
+    .main-container {
+        padding-top: 160px;
+        padding-bottom: 80px; /* Espaço para o botão flutuante */
+        gap: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        padding-top: 150px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-container {
+        padding-top: 140px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .main-container {
+        padding-top: 135px;
+    }
 }
