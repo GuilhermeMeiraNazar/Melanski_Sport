@@ -1,0 +1,561 @@
+.user-management {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    .users-header {
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 15px;
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+
+            svg {
+                color: $vermelho-principal;
+                font-size: 24px;
+            }
+
+            h2 {
+                color: $vermelho-principal;
+                margin: 0;
+                font-size: 24px;
+            }
+        }
+
+        .users-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+    }
+
+    .users-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            label {
+                font-size: 13px;
+                font-weight: 600;
+                color: #666;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+
+                svg {
+                    font-size: 12px;
+                }
+            }
+
+            select {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                background: white;
+                cursor: pointer;
+                transition: all 0.3s;
+
+                &:hover {
+                    border-color: $vermelho-principal;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: $vermelho-principal;
+                    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+                }
+            }
+        }
+
+        .btn-add-user {
+            padding: 10px 20px;
+            background: $vermelho-principal;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+
+            &:hover {
+                background: darken($vermelho-principal, 10%);
+                transform: translateY(-1px);
+            }
+
+            svg {
+                font-size: 14px;
+            }
+        }
+    }
+
+    .user-management-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        gap: 15px;
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f0f0f0;
+            border-top-color: $vermelho-principal;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        p {
+            color: #666;
+            font-size: 14px;
+        }
+    }
+
+    .users-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        gap: 15px;
+        color: #999;
+
+        svg {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 0;
+        }
+    }
+
+    .users-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .user-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            background: white;
+
+            &:hover {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                transform: translateY(-1px);
+            }
+
+            .user-info {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                min-width: 0;
+
+                .user-name {
+                    font-weight: 600;
+                    color: #333;
+                    font-size: 16px;
+                }
+
+                .user-email {
+                    color: #666;
+                    font-size: 14px;
+                }
+
+                .user-meta {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                    margin-top: 5px;
+
+                    .user-role-badge {
+                        padding: 4px 10px;
+                        border-radius: 4px;
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: white;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    .user-date {
+                        font-size: 12px;
+                        color: #999;
+                    }
+
+                    .user-temp-badge {
+                        padding: 4px 8px;
+                        background: #ffc107;
+                        color: #333;
+                        border-radius: 4px;
+                        font-size: 11px;
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .user-actions {
+                display: flex;
+                gap: 8px;
+                flex-shrink: 0;
+
+                button {
+                    width: 36px;
+                    height: 36px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s;
+                    font-size: 14px;
+
+                    &.btn-edit {
+                        background: #007bff;
+                        color: white;
+
+                        &:hover {
+                            background: darken(#007bff, 10%);
+                        }
+                    }
+
+                    &.btn-reset {
+                        background: #ffc107;
+                        color: #333;
+
+                        &:hover {
+                            background: darken(#ffc107, 10%);
+                        }
+                    }
+
+                    &.btn-delete {
+                        background: #dc3545;
+                        color: white;
+
+                        &:hover {
+                            background: darken(#dc3545, 10%);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Modal
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+                border-bottom: 1px solid #e0e0e0;
+
+                h3 {
+                    margin: 0;
+                    color: $vermelho-principal;
+                    font-size: 20px;
+                }
+
+                .btn-close {
+                    background: none;
+                    border: none;
+                    font-size: 28px;
+                    color: #999;
+                    cursor: pointer;
+                    line-height: 1;
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover {
+                        color: #333;
+                    }
+                }
+            }
+
+            form {
+                padding: 20px;
+
+                .form-group {
+                    margin-bottom: 15px;
+
+                    label {
+                        display: block;
+                        margin-bottom: 5px;
+                        font-weight: 600;
+                        color: #333;
+                        font-size: 14px;
+                    }
+
+                    input, select {
+                        width: 100%;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        transition: all 0.3s;
+
+                        &:focus {
+                            outline: none;
+                            border-color: $vermelho-principal;
+                            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+                        }
+
+                        &:disabled {
+                            background: #f5f5f5;
+                            cursor: not-allowed;
+                        }
+                    }
+
+                    small {
+                        display: block;
+                        margin-top: 5px;
+                        color: #666;
+                        font-size: 12px;
+                    }
+                }
+
+                .form-note {
+                    background: #e7f3ff;
+                    border-left: 4px solid #007bff;
+                    padding: 12px;
+                    margin-bottom: 15px;
+                    font-size: 13px;
+                    color: #333;
+                    border-radius: 4px;
+                }
+
+                .modal-actions {
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                    margin-top: 20px;
+
+                    button {
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s;
+
+                        &.btn-secondary {
+                            background: #6c757d;
+                            color: white;
+
+                            &:hover {
+                                background: darken(#6c757d, 10%);
+                            }
+                        }
+
+                        &.btn-primary {
+                            background: $vermelho-principal;
+                            color: white;
+
+                            &:hover:not(:disabled) {
+                                background: darken($vermelho-principal, 10%);
+                            }
+
+                            &:disabled {
+                                opacity: 0.6;
+                                cursor: not-allowed;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .password-display {
+                padding: 30px;
+                text-align: center;
+
+                h4 {
+                    color: #28a745;
+                    margin-bottom: 15px;
+                }
+
+                p {
+                    color: #666;
+                    margin-bottom: 10px;
+                }
+
+                .temp-password {
+                    background: #f0f0f0;
+                    border: 2px solid $vermelho-principal;
+                    padding: 20px;
+                    border-radius: 8px;
+                    font-size: 24px;
+                    font-weight: bold;
+                    font-family: monospace;
+                    letter-spacing: 2px;
+                    color: $vermelho-principal;
+                    margin: 20px 0;
+                    word-break: break-all;
+                }
+
+                .password-note {
+                    background: #fff3cd;
+                    border: 1px solid #ffc107;
+                    padding: 15px;
+                    border-radius: 4px;
+                    font-size: 13px;
+                    color: #333;
+                    margin: 20px 0;
+                }
+
+                .btn-primary {
+                    padding: 12px 30px;
+                    background: $vermelho-principal;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+
+                    &:hover {
+                        background: darken($vermelho-principal, 10%);
+                    }
+                }
+            }
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    // Responsividade
+    @media (max-width: 768px) {
+        padding: 15px;
+
+        .users-header {
+            .header-title {
+                h2 {
+                    font-size: 20px;
+                }
+
+                svg {
+                    font-size: 20px;
+                }
+            }
+        }
+
+        .users-controls {
+            flex-direction: column;
+            align-items: stretch;
+
+            .filter-group {
+                width: 100%;
+
+                select {
+                    width: 100%;
+                }
+            }
+
+            .btn-add-user {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .users-list {
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+
+                .user-info {
+                    width: 100%;
+                }
+
+                .user-actions {
+                    width: 100%;
+                    justify-content: flex-end;
+                }
+            }
+        }
+
+        .modal-overlay {
+            padding: 10px;
+
+            .modal-content {
+                .modal-header {
+                    padding: 15px;
+
+                    h3 {
+                        font-size: 18px;
+                    }
+                }
+
+                form {
+                    padding: 15px;
+                }
+
+                .password-display {
+                    padding: 20px;
+
+                    .temp-password {
+                        font-size: 18px;
+                        padding: 15px;
+                    }
+                }
+            }
+        }
+    }
+}

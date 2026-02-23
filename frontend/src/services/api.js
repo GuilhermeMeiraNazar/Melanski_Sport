@@ -106,4 +106,16 @@ export const orderSvc = {
     updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status })
 };
 
+// --- SERVIÇO DE GERENCIAMENTO DE USUÁRIOS ---
+export const userManagementSvc = {
+    list: (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        return api.get(`/users?${queryString}`);
+    },
+    create: (data) => api.post('/users', data),
+    update: (id, data) => api.put(`/users/${id}`, data),
+    delete: (id) => api.delete(`/users/${id}`),
+    resetPassword: (id) => api.post(`/users/${id}/reset-password`)
+};
+
 export default api;

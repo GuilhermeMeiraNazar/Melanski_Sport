@@ -191,8 +191,245 @@ const sendWelcomeEmail = async (email, name) => {
     }
 };
 
+// Enviar email para novo usuário administrativo
+const sendUserCreatedEmail = async (email, name, role, password) => {
+    try {
+        const transporter = createTransporter();
+
+        const roleNames = {
+            developer: 'Desenvolvedor',
+            administrator: 'Administrador',
+            operator: 'Operador'
+        };
+
+        const mailOptions = {
+            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Bem-vindo à Equipe Melanski Sport! 🎉',
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                        }
+                        .header {
+                            background-color: #dc143c;
+                            color: white;
+                            padding: 20px;
+                            text-align: center;
+                            border-radius: 5px 5px 0 0;
+                        }
+                        .content {
+                            background-color: white;
+                            padding: 30px;
+                            border-radius: 0 0 5px 5px;
+                        }
+                        .credentials {
+                            background-color: #f0f0f0;
+                            padding: 20px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                            border-left: 4px solid #dc143c;
+                        }
+                        .password {
+                            font-size: 18px;
+                            font-weight: bold;
+                            color: #dc143c;
+                            font-family: monospace;
+                            letter-spacing: 1px;
+                            margin: 10px 0;
+                        }
+                        .warning {
+                            background-color: #fff3cd;
+                            border: 1px solid #ffc107;
+                            padding: 15px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🎉 Bem-vindo à Equipe!</h1>
+                        </div>
+                        <div class="content">
+                            <h2>Olá, ${name}!</h2>
+                            <p>Você foi adicionado como <strong>${roleNames[role]}</strong> no sistema Melanski Sport.</p>
+                            
+                            <div class="credentials">
+                                <h3>Suas Credenciais de Acesso:</h3>
+                                <p><strong>Email:</strong> ${email}</p>
+                                <p><strong>Senha Temporária:</strong></p>
+                                <div class="password">${password}</div>
+                            </div>
+
+                            <div class="warning">
+                                <strong>⚠️ IMPORTANTE:</strong>
+                                <ul>
+                                    <li>Esta é uma senha temporária</li>
+                                    <li>Você será solicitado a alterá-la no primeiro login</li>
+                                    <li>Não compartilhe esta senha com ninguém</li>
+                                    <li>Guarde-a em local seguro até fazer o primeiro acesso</li>
+                                </ul>
+                            </div>
+
+                            <p>Para acessar o painel administrativo:</p>
+                            <ol>
+                                <li>Acesse: <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}">${process.env.FRONTEND_URL || 'http://localhost:5173'}</a></li>
+                                <li>Clique em "Minha Conta"</li>
+                                <li>Faça login com suas credenciais</li>
+                                <li>Altere sua senha no primeiro acesso</li>
+                            </ol>
+                            
+                            <p>Atenciosamente,<br>Equipe Melanski Sport</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Email de criação de usuário enviado');
+    } catch (error) {
+        console.error('❌ Erro ao enviar email de criação:', error);
+        throw error;
+    }
+};
+
+// Enviar email quando role de cliente é alterado para administrativo
+const sendUserRoleChangedEmail = async (email, name, newRole, password) => {
+    try {
+        const transporter = createTransporter();
+
+        const roleNames = {
+            developer: 'Desenvolvedor',
+            administrator: 'Administrador',
+            operator: 'Operador'
+        };
+
+        const mailOptions = {
+            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Sua Conta Foi Atualizada - Melanski Sport',
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                        }
+                        .header {
+                            background-color: #dc143c;
+                            color: white;
+                            padding: 20px;
+                            text-align: center;
+                            border-radius: 5px 5px 0 0;
+                        }
+                        .content {
+                            background-color: white;
+                            padding: 30px;
+                            border-radius: 0 0 5px 5px;
+                        }
+                        .credentials {
+                            background-color: #f0f0f0;
+                            padding: 20px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                            border-left: 4px solid #dc143c;
+                        }
+                        .password {
+                            font-size: 18px;
+                            font-weight: bold;
+                            color: #dc143c;
+                            font-family: monospace;
+                            letter-spacing: 1px;
+                            margin: 10px 0;
+                        }
+                        .warning {
+                            background-color: #fff3cd;
+                            border: 1px solid #ffc107;
+                            padding: 15px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🎉 Sua Conta Foi Atualizada!</h1>
+                        </div>
+                        <div class="content">
+                            <h2>Olá, ${name}!</h2>
+                            <p>Sua conta de cliente foi atualizada para <strong>${roleNames[newRole]}</strong> no sistema Melanski Sport.</p>
+                            <p>Agora você tem acesso ao painel administrativo!</p>
+                            
+                            <div class="credentials">
+                                <h3>Suas Novas Credenciais:</h3>
+                                <p><strong>Email:</strong> ${email}</p>
+                                <p><strong>Nova Senha Temporária:</strong></p>
+                                <div class="password">${password}</div>
+                            </div>
+
+                            <div class="warning">
+                                <strong>⚠️ IMPORTANTE:</strong>
+                                <ul>
+                                    <li>Por segurança, sua senha anterior foi alterada</li>
+                                    <li>Esta é uma senha temporária</li>
+                                    <li>Você será solicitado a alterá-la no primeiro login</li>
+                                    <li>Não compartilhe esta senha com ninguém</li>
+                                </ul>
+                            </div>
+
+                            <p>Para acessar o painel administrativo:</p>
+                            <ol>
+                                <li>Acesse: <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}">${process.env.FRONTEND_URL || 'http://localhost:5173'}</a></li>
+                                <li>Clique em "Minha Conta"</li>
+                                <li>Faça login com suas novas credenciais</li>
+                                <li>Altere sua senha no primeiro acesso</li>
+                            </ol>
+                            
+                            <p>Atenciosamente,<br>Equipe Melanski Sport</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Email de mudança de role enviado');
+    } catch (error) {
+        console.error('❌ Erro ao enviar email de mudança:', error);
+        throw error;
+    }
+};
+
 module.exports = {
     generateVerificationCode,
     sendVerificationEmail,
-    sendWelcomeEmail
+    sendWelcomeEmail,
+    sendUserCreatedEmail,
+    sendUserRoleChangedEmail
 };
