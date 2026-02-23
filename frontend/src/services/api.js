@@ -19,9 +19,22 @@ api.interceptors.response.use(
     (error) => {
         // Tratamento de erros de autenticação
         if (error.response?.status === 401) {
+            // Verificar se não estamos já na home
+            const currentPath = window.location.pathname;
+            
+            // Limpar dados de autenticação
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/';
+            
+            // Só redirecionar se não estiver na home
+            if (currentPath !== '/' && currentPath !== '/home') {
+                console.warn('Token expirado ou inválido. Redirecionando para home...');
+                
+                // Usar setTimeout para evitar problemas de navegação
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 100);
+            }
         }
         
         // Tratamento de erros de permissão

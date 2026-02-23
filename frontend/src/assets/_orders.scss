@@ -12,10 +12,41 @@
 .orders-header {
   margin-bottom: 30px;
 
+  .header-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
   h2 {
     font-size: 28px;
-    margin-bottom: 20px;
     color: $vermelho-principal;
+  }
+
+  .btn-manual-sale {
+    padding: 12px 24px;
+    background: $vermelho-principal;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: darken($vermelho-principal, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+    }
+
+    svg {
+      font-size: 16px;
+    }
   }
 }
 
@@ -98,14 +129,15 @@
   }
 }
 
-// Grid de Pedidos
+// Grid de Pedidos - Um pedido por vez, largura total
 .orders-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  max-width: 100%;
 }
 
-// Card de Pedido
+// Card de Pedido - Layout compacto e organizado
 .order-card {
   background: white;
   border-radius: 12px;
@@ -113,6 +145,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
   border-left: 4px solid #ddd;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -181,22 +217,23 @@
 .order-info-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   color: #555;
+  line-height: 1.4;
 
   svg {
     margin-top: 2px;
     color: $vermelho-principal;
     flex-shrink: 0;
+    font-size: 14px;
   }
 
   .user-badge {
     background: #E3F2FD;
-    padding: 4px 8px;
+    padding: 3px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     color: #1976D2;
     font-weight: 600;
   }
@@ -207,40 +244,88 @@
   line-height: 1.5;
 }
 
-.order-section {
-  margin: 15px 0;
-  padding: 15px 0;
-  border-bottom: 1px solid #f0f0f0;
+// Grid de informações principais (Cliente + Endereço)
+.order-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
 
-  &:last-of-type {
-    border-bottom: none;
-  }
+.order-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
   h4 {
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: bold;
+    color: $vermelho-principal;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Seção de itens (largura total, expansível)
+.order-items-section {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+
+  h4 {
+    font-size: 13px;
     font-weight: bold;
     color: $vermelho-principal;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 }
 
 .order-items {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #999;
+    }
+  }
 }
 
 .order-item {
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 10px;
-  padding: 10px;
-  background: #f8f9fa;
+  padding: 8px 10px;
+  background: white;
   border-radius: 6px;
   font-size: 13px;
+  border: 1px solid #e0e0e0;
 }
 
 .item-info {
@@ -270,14 +355,50 @@
   white-space: nowrap;
 }
 
+// Seção de observações (sempre visível, com limite)
+.order-notes-section {
+  padding: 12px 15px;
+  background: #FFF9E6;
+  border-radius: 8px;
+  border-left: 3px solid #FFC107;
+
+  h4 {
+    font-size: 12px;
+    font-weight: bold;
+    color: #F57C00;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
 .order-notes {
   font-size: 13px;
   color: #666;
-  font-style: italic;
-  background: #f8f9fa;
-  padding: 10px;
-  border-radius: 6px;
+  line-height: 1.5;
   margin: 0;
+  word-wrap: break-word;
+  max-height: 60px;
+  overflow-y: auto;
+  
+  &.empty {
+    color: #999;
+    font-style: italic;
+  }
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+  }
 }
 
 .order-total {
@@ -285,44 +406,44 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: $vermelho-principal;
-  padding: 15px 0;
-  border-top: 2px solid #f0f0f0;
-  margin-top: 15px;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
 
   svg {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   strong {
-    font-size: 22px;
+    font-size: 20px;
   }
 }
 
 .order-footer {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f0f0f0;
+  padding: 8px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
 
   small {
-    font-size: 12px;
+    font-size: 11px;
     color: #999;
+    display: block;
   }
 }
 
 .order-actions {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
 
   button {
     flex: 1;
-    padding: 12px;
+    padding: 10px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
@@ -393,12 +514,17 @@
 
 // Responsive
 @media (max-width: 768px) {
-  .orders-grid {
-    grid-template-columns: 1fr;
+  .orders-view {
+    padding: 15px;
   }
 
   .orders-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .order-main-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .order-item {

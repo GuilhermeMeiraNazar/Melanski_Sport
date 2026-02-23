@@ -23,18 +23,18 @@ const createOrderSchema = Joi.object({
       'string.email': 'Email inválido'
     }),
   
-  customer_phone: Joi.string().required().min(10).max(20)
+  customer_phone: Joi.string().required().min(10).max(30)
     .messages({
       'string.empty': 'Telefone é obrigatório',
       'string.min': 'Telefone deve ter no mínimo 10 caracteres',
-      'string.max': 'Telefone deve ter no máximo 20 caracteres'
+      'string.max': 'Telefone deve ter no máximo 30 caracteres'
     }),
   
   // Endereço de entrega
-  delivery_address: Joi.string().required().min(10).max(500)
+  delivery_address: Joi.string().required().min(5).max(500)
     .messages({
       'string.empty': 'Endereço de entrega é obrigatório',
-      'string.min': 'Endereço deve ter no mínimo 10 caracteres',
+      'string.min': 'Endereço deve ter no mínimo 5 caracteres',
       'string.max': 'Endereço deve ter no máximo 500 caracteres'
     }),
   
@@ -45,24 +45,24 @@ const createOrderSchema = Joi.object({
       'string.max': 'Cidade deve ter no máximo 100 caracteres'
     }),
   
-  delivery_state: Joi.string().required().length(2).uppercase()
+  delivery_state: Joi.string().required().length(2)
     .messages({
       'string.empty': 'Estado é obrigatório',
       'string.length': 'Estado deve ter 2 caracteres (ex: SP)',
-      'string.uppercase': 'Estado deve estar em maiúsculas'
+      'any.required': 'Estado é obrigatório'
     }),
   
-  delivery_zip: Joi.string().required().min(8).max(10)
+  delivery_zip: Joi.string().required().min(8).max(20)
     .messages({
       'string.empty': 'CEP é obrigatório',
       'string.min': 'CEP deve ter no mínimo 8 caracteres',
-      'string.max': 'CEP deve ter no máximo 10 caracteres'
+      'string.max': 'CEP deve ter no máximo 20 caracteres'
     }),
   
-  // Observações
-  notes: Joi.string().allow(null, '').max(1000).optional()
+  // Observações (limite de 100 caracteres)
+  notes: Joi.string().allow(null, '').max(100).optional()
     .messages({
-      'string.max': 'Observações devem ter no máximo 1000 caracteres'
+      'string.max': 'Observações devem ter no máximo 100 caracteres'
     }),
   
   // Itens do pedido

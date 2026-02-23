@@ -71,45 +71,48 @@ const OrderCard = ({ order, onStatusChange }) => {
         <span>{formatDate(order.created_at)}</span>
       </div>
 
-      {/* Dados do Cliente */}
-      <div className="order-section">
-        <h4>Cliente</h4>
-        <div className="order-info-row">
-          <FaUser />
-          <span>{order.customer_name}</span>
-        </div>
-        {order.customer_email && (
-          <div className="order-info-row">
-            <FaEnvelope />
-            <span>{order.customer_email}</span>
-          </div>
-        )}
-        <div className="order-info-row">
-          <FaPhone />
-          <span>{order.customer_phone}</span>
-        </div>
-        {order.customer_user_name && (
+      {/* Grid Principal: Cliente + Endereço */}
+      <div className="order-main-grid">
+        {/* Coluna Esquerda: Dados do Cliente */}
+        <div className="order-section">
+          <h4><FaUser /> Cliente</h4>
           <div className="order-info-row">
             <FaUser />
-            <span className="user-badge">Usuário: {order.customer_user_name}</span>
+            <span>{order.customer_name}</span>
           </div>
-        )}
-      </div>
+          {order.customer_email && (
+            <div className="order-info-row">
+              <FaEnvelope />
+              <span>{order.customer_email}</span>
+            </div>
+          )}
+          <div className="order-info-row">
+            <FaPhone />
+            <span>{order.customer_phone}</span>
+          </div>
+          {order.customer_user_name && (
+            <div className="order-info-row">
+              <FaUser />
+              <span className="user-badge">Usuário: {order.customer_user_name}</span>
+            </div>
+          )}
+        </div>
 
-      {/* Endereço de Entrega */}
-      <div className="order-section">
-        <h4>Endereço de Entrega</h4>
-        <div className="order-info-row">
-          <FaMapMarkerAlt />
-          <div className="address-text">
-            <div>{order.delivery_address}</div>
-            <div>{order.delivery_city}/{order.delivery_state} - CEP: {order.delivery_zip}</div>
+        {/* Coluna Direita: Endereço de Entrega */}
+        <div className="order-section">
+          <h4><FaMapMarkerAlt /> Endereço</h4>
+          <div className="order-info-row">
+            <FaMapMarkerAlt />
+            <div className="address-text">
+              <div>{order.delivery_address}</div>
+              <div>{order.delivery_city}/{order.delivery_state} - CEP: {order.delivery_zip}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Itens do Pedido */}
-      <div className="order-section">
+      {/* Seção de Itens (Largura Total) */}
+      <div className="order-items-section">
         <h4>
           <FaShoppingBag /> Itens ({order.items?.length || 0})
         </h4>
@@ -133,13 +136,13 @@ const OrderCard = ({ order, onStatusChange }) => {
         </div>
       </div>
 
-      {/* Observações */}
-      {order.notes && (
-        <div className="order-section">
-          <h4>Observações</h4>
-          <p className="order-notes">{order.notes}</p>
-        </div>
-      )}
+      {/* Observações (Sempre Visível) */}
+      <div className="order-notes-section">
+        <h4>Observações</h4>
+        <p className={`order-notes ${!order.notes ? 'empty' : ''}`}>
+          {order.notes || 'Nenhuma observação'}
+        </p>
+      </div>
 
       {/* Total */}
       <div className="order-total">

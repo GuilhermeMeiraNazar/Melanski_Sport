@@ -4,7 +4,7 @@ const orderController = require('../controllers/orderController');
 const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createOrderSchema, updateStatusSchema } = require('../validators/orderValidator');
-const { apiLimiter, createLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Listar pedidos - Apenas Developer, Administrator, Operator
 router.get(
@@ -27,7 +27,7 @@ router.get(
 // Criar pedido - Qualquer usuário autenticado ou público (carrinho)
 router.post(
   '/',
-  createLimiter,
+  apiLimiter,
   validate(createOrderSchema),
   orderController.create
 );

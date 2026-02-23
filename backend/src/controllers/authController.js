@@ -46,7 +46,7 @@ const authController = {
                 full_name: user.full_name 
             },
             JWT_SECRET,
-            { expiresIn: '8h' }
+            { expiresIn: '7d' } // 7 dias ao invés de 8 horas
         );
 
         res.json({
@@ -163,7 +163,7 @@ const authController = {
                 full_name: user.full_name 
             },
             JWT_SECRET,
-            { expiresIn: '8h' }
+            { expiresIn: '7d' } // 7 dias
         );
 
         res.json({

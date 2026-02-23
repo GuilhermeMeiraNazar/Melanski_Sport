@@ -311,9 +311,10 @@ const Cart = ({ isOpen, onClose, cartItems, removeItem }) => {
                                 </div>
                             </div>
                         ))
-                        </div>
+                    )}
+                </div>
 
-                        <div className="cart-footer">
+                <div className="cart-footer">
                             <div className="total-row">
                                 <span>Total do Pedido:</span>
                                 <strong>{formatPrice(total)}</strong>

@@ -22,14 +22,23 @@ const createProductSchema = Joi.object({
             'string.max': 'Descrição deve ter no máximo 1000 caracteres'
         }),
     
-    sale_price: Joi.number()
+    // Aceita tanto salePrice (frontend) quanto sale_price (backend)
+    salePrice: Joi.number()
         .required()
         .positive()
-        .precision(2)
         .messages({
             'number.base': 'Preço deve ser um número',
             'number.positive': 'Preço deve ser positivo',
             'any.required': 'Preço é obrigatório'
+        }),
+    
+    // Aceita tanto costPrice (frontend) quanto cost_price (backend)
+    costPrice: Joi.number()
+        .positive()
+        .allow(0)
+        .messages({
+            'number.base': 'Custo deve ser um número',
+            'number.positive': 'Custo deve ser positivo'
         }),
     
     category_id: Joi.number()
@@ -43,6 +52,13 @@ const createProductSchema = Joi.object({
             'any.required': 'Categoria é obrigatória'
         }),
     
+    // Campo adicional que o frontend envia
+    category: Joi.string()
+        .allow('', null)
+        .messages({
+            'string.base': 'Nome da categoria deve ser texto'
+        }),
+    
     team: Joi.string()
         .allow('', null)
         .max(50)
@@ -51,10 +67,18 @@ const createProductSchema = Joi.object({
         }),
     
     gender: Joi.string()
-        .valid('Masculino', 'Feminino', 'Unissex', '')
+        .valid('Masculino', 'Feminino', 'Unissex', 'Infantil', '')
         .allow(null)
         .messages({
-            'any.only': 'Gênero deve ser Masculino, Feminino ou Unissex'
+            'any.only': 'Gênero deve ser Masculino, Feminino, Infantil ou Unissex'
+        }),
+    
+    // Aceita tanto origin (frontend) quanto type (backend)
+    origin: Joi.string()
+        .valid('Nacional', 'Internacional', '')
+        .allow(null)
+        .messages({
+            'any.only': 'Origem deve ser Nacional ou Internacional'
         }),
     
     type: Joi.string()
@@ -64,6 +88,13 @@ const createProductSchema = Joi.object({
             'any.only': 'Tipo deve ser Nacional ou Internacional'
         }),
     
+    // Aceita tanto hasDiscount (frontend) quanto has_discount (backend)
+    hasDiscount: Joi.boolean()
+        .default(false)
+        .messages({
+            'boolean.base': 'hasDiscount deve ser verdadeiro ou falso'
+        }),
+    
     has_discount: Joi.number()
         .valid(0, 1)
         .default(0)
@@ -71,22 +102,44 @@ const createProductSchema = Joi.object({
             'any.only': 'has_discount deve ser 0 ou 1'
         }),
     
-    discount_percentage: Joi.number()
+    // Aceita tanto discountPercentage (frontend) quanto discount_percentage (backend)
+    discountPercentage: Joi.number()
         .min(0)
         .max(100)
-        .precision(2)
         .default(0)
         .messages({
             'number.min': 'Desconto não pode ser negativo',
             'number.max': 'Desconto não pode ser maior que 100%'
         }),
     
+    discount_percentage: Joi.number()
+        .min(0)
+        .max(100)
+        .default(0)
+        .messages({
+            'number.min': 'Desconto não pode ser negativo',
+            'number.max': 'Desconto não pode ser maior que 100%'
+        }),
+    
+    // Aceita imagens como array de strings (base64 ou URLs)
     images: Joi.array()
-        .items(Joi.string().uri())
+        .items(Joi.string())
         .min(1)
         .messages({
-            'array.min': 'Pelo menos uma imagem é obrigatória',
-            'string.uri': 'URL de imagem inválida'
+            'array.min': 'Pelo menos uma imagem é obrigatória'
+        }),
+    
+    // Aceita tanto stock (frontend) quanto sizes (backend)
+    stock: Joi.alternatives()
+        .try(
+            Joi.number().integer().min(0),
+            Joi.object().pattern(
+                Joi.string(),
+                Joi.number().integer().min(0)
+            )
+        )
+        .messages({
+            'number.min': 'Quantidade não pode ser negativa'
         }),
     
     sizes: Joi.object()
@@ -119,11 +172,17 @@ const updateProductSchema = Joi.object({
             'string.max': 'Descrição deve ter no máximo 1000 caracteres'
         }),
     
-    sale_price: Joi.number()
+    salePrice: Joi.number()
         .positive()
-        .precision(2)
         .messages({
             'number.positive': 'Preço deve ser positivo'
+        }),
+    
+    costPrice: Joi.number()
+        .positive()
+        .allow(0)
+        .messages({
+            'number.positive': 'Custo deve ser positivo'
         }),
     
     category_id: Joi.number()
@@ -134,6 +193,9 @@ const updateProductSchema = Joi.object({
             'number.positive': 'ID da categoria inválido'
         }),
     
+    category: Joi.string()
+        .allow('', null),
+    
     team: Joi.string()
         .allow('', null)
         .max(50)
@@ -142,10 +204,17 @@ const updateProductSchema = Joi.object({
         }),
     
     gender: Joi.string()
-        .valid('Masculino', 'Feminino', 'Unissex', '')
+        .valid('Masculino', 'Feminino', 'Unissex', 'Infantil', '')
         .allow(null)
         .messages({
-            'any.only': 'Gênero deve ser Masculino, Feminino ou Unissex'
+            'any.only': 'Gênero deve ser Masculino, Feminino, Infantil ou Unissex'
+        }),
+    
+    origin: Joi.string()
+        .valid('Nacional', 'Internacional', '')
+        .allow(null)
+        .messages({
+            'any.only': 'Origem deve ser Nacional ou Internacional'
         }),
     
     type: Joi.string()
@@ -155,25 +224,49 @@ const updateProductSchema = Joi.object({
             'any.only': 'Tipo deve ser Nacional ou Internacional'
         }),
     
+    hasDiscount: Joi.boolean()
+        .messages({
+            'boolean.base': 'hasDiscount deve ser verdadeiro ou falso'
+        }),
+    
     has_discount: Joi.number()
         .valid(0, 1)
         .messages({
             'any.only': 'has_discount deve ser 0 ou 1'
         }),
     
+    discountPercentage: Joi.number()
+        .min(0)
+        .max(100)
+        .messages({
+            'number.min': 'Desconto não pode ser negativo',
+            'number.max': 'Desconto não pode ser maior que 100%'
+        }),
+    
     discount_percentage: Joi.number()
         .min(0)
         .max(100)
-        .precision(2)
         .messages({
             'number.min': 'Desconto não pode ser negativo',
             'number.max': 'Desconto não pode ser maior que 100%'
         }),
     
     images: Joi.array()
-        .items(Joi.string().uri())
+        .items(Joi.string())
         .messages({
-            'string.uri': 'URL de imagem inválida'
+            'string.base': 'Imagem deve ser uma string'
+        }),
+    
+    stock: Joi.alternatives()
+        .try(
+            Joi.number().integer().min(0),
+            Joi.object().pattern(
+                Joi.string(),
+                Joi.number().integer().min(0)
+            )
+        )
+        .messages({
+            'number.min': 'Quantidade não pode ser negativa'
         }),
     
     sizes: Joi.object()
