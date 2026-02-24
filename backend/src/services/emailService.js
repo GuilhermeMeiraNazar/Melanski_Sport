@@ -1,16 +1,33 @@
 const nodemailer = require('nodemailer');
+const credentialsService = require('./credentialsService');
 
-// Configuração do transporter (será configurado via .env)
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: parseInt(process.env.EMAIL_PORT) || 587,
-        secure: process.env.EMAIL_SECURE === 'true', // true para 465, false para outras portas
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
+// Configuração do transporter (usa credentialsService ou fallback para .env)
+const createTransporter = async () => {
+    try {
+        const credentials = await credentialsService.getCredentials('email');
+        
+        return nodemailer.createTransport({
+            host: credentials.host,
+            port: parseInt(credentials.port) || 587,
+            secure: credentials.secure === 'true' || credentials.secure === true,
+            auth: {
+                user: credentials.user,
+                pass: credentials.password
+            }
+        });
+    } catch (error) {
+        // Fallback para .env se credentialsService falhar
+        console.warn('⚠️ Usando credenciais de email do .env (fallback)');
+        return nodemailer.createTransporter({
+            host: process.env.EMAIL_HOST,
+            port: parseInt(process.env.EMAIL_PORT) || 587,
+            secure: process.env.EMAIL_SECURE === 'true',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+    }
 };
 
 // Gerar código de verificação de 6 dígitos
@@ -21,10 +38,13 @@ const generateVerificationCode = () => {
 // Enviar email de verificação
 const sendVerificationEmail = async (email, name, code) => {
     try {
-        const transporter = createTransporter();
+        const transporter = await createTransporter();
+        const credentials = await credentialsService.getCredentials('email').catch(() => ({}));
+        const fromName = credentials.from_name || process.env.EMAIL_FROM_NAME || 'Melanski Sport';
+        const fromEmail = credentials.user || process.env.EMAIL_USER;
 
         const mailOptions = {
-            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: 'Verificação de Email - Melanski Sport',
             html: `
@@ -113,10 +133,15 @@ const sendVerificationEmail = async (email, name, code) => {
 // Enviar email de boas-vindas após verificação
 const sendWelcomeEmail = async (email, name) => {
     try {
-        const transporter = createTransporter();
+        const transporter = await createTransporter();
+        const credentials = await credentialsService.getCredentials('email').catch(() => ({}));
+        const fromName = credentials.from_name || process.env.EMAIL_FROM_NAME || 'Melanski Sport';
+        const fromEmail = credentials.user || process.env.EMAIL_USER;
+        const urlCredentials = await credentialsService.getCredentials('urls').catch(() => ({}));
+        const frontendUrl = urlCredentials.frontend_url || process.env.FRONTEND_URL || 'http://localhost:5173';
 
         const mailOptions = {
-            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: 'Bem-vindo à Melanski Sport! 🎉',
             html: `
@@ -170,7 +195,7 @@ const sendWelcomeEmail = async (email, name) => {
                             <p>Explore nossos produtos e aproveite as melhores ofertas!</p>
                             
                             <div style="text-align: center;">
-                                <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" class="button">
+                                <a href="${frontendUrl}" class="button">
                                     Começar a Comprar
                                 </a>
                             </div>
@@ -194,7 +219,12 @@ const sendWelcomeEmail = async (email, name) => {
 // Enviar email para novo usuário administrativo
 const sendUserCreatedEmail = async (email, name, role, password) => {
     try {
-        const transporter = createTransporter();
+        const transporter = await createTransporter();
+        const credentials = await credentialsService.getCredentials('email').catch(() => ({}));
+        const fromName = credentials.from_name || process.env.EMAIL_FROM_NAME || 'Melanski Sport';
+        const fromEmail = credentials.user || process.env.EMAIL_USER;
+        const urlCredentials = await credentialsService.getCredentials('urls').catch(() => ({}));
+        const frontendUrl = urlCredentials.frontend_url || process.env.FRONTEND_URL || 'http://localhost:5173';
 
         const roleNames = {
             developer: 'Desenvolvedor',
@@ -203,7 +233,7 @@ const sendUserCreatedEmail = async (email, name, role, password) => {
         };
 
         const mailOptions = {
-            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: 'Bem-vindo à Equipe Melanski Sport! 🎉',
             html: `
@@ -286,7 +316,7 @@ const sendUserCreatedEmail = async (email, name, role, password) => {
 
                             <p>Para acessar o painel administrativo:</p>
                             <ol>
-                                <li>Acesse: <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}">${process.env.FRONTEND_URL || 'http://localhost:5173'}</a></li>
+                                <li>Acesse: <a href="${frontendUrl}">${frontendUrl}</a></li>
                                 <li>Clique em "Minha Conta"</li>
                                 <li>Faça login com suas credenciais</li>
                                 <li>Altere sua senha no primeiro acesso</li>
@@ -311,7 +341,12 @@ const sendUserCreatedEmail = async (email, name, role, password) => {
 // Enviar email quando role de cliente é alterado para administrativo
 const sendUserRoleChangedEmail = async (email, name, newRole, password) => {
     try {
-        const transporter = createTransporter();
+        const transporter = await createTransporter();
+        const credentials = await credentialsService.getCredentials('email').catch(() => ({}));
+        const fromName = credentials.from_name || process.env.EMAIL_FROM_NAME || 'Melanski Sport';
+        const fromEmail = credentials.user || process.env.EMAIL_USER;
+        const urlCredentials = await credentialsService.getCredentials('urls').catch(() => ({}));
+        const frontendUrl = urlCredentials.frontend_url || process.env.FRONTEND_URL || 'http://localhost:5173';
 
         const roleNames = {
             developer: 'Desenvolvedor',
@@ -320,7 +355,7 @@ const sendUserRoleChangedEmail = async (email, name, newRole, password) => {
         };
 
         const mailOptions = {
-            from: `"${process.env.EMAIL_FROM_NAME || 'Melanski Sport'}" <${process.env.EMAIL_USER}>`,
+            from: `"${fromName}" <${fromEmail}>`,
             to: email,
             subject: 'Sua Conta Foi Atualizada - Melanski Sport',
             html: `
@@ -404,7 +439,7 @@ const sendUserRoleChangedEmail = async (email, name, newRole, password) => {
 
                             <p>Para acessar o painel administrativo:</p>
                             <ol>
-                                <li>Acesse: <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}">${process.env.FRONTEND_URL || 'http://localhost:5173'}</a></li>
+                                <li>Acesse: <a href="${frontendUrl}">${frontendUrl}</a></li>
                                 <li>Clique em "Minha Conta"</li>
                                 <li>Faça login com suas novas credenciais</li>
                                 <li>Altere sua senha no primeiro acesso</li>

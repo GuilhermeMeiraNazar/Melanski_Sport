@@ -5,7 +5,7 @@ import {
     FaFileExport, FaBars, FaShoppingCart 
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { productSvc } from '../../services/api';
+import { productSvc, developerSettingsSvc } from '../../services/api';
 import { getErrorMessage } from '../../utils/apiHelpers';
 
 // Componentes do Admin
@@ -40,6 +40,14 @@ const Admin = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [showDevSettings, setShowDevSettings] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [features, setFeatures] = useState({
+        feature_orders: true,
+        feature_logs: true,
+        feature_appearance: true,
+        feature_export: true,
+        feature_insights: true,
+        feature_users: true
+    });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -47,10 +55,30 @@ const Admin = () => {
             navigate('/');
             return;
         }
+        loadFeatures();
         if (currentView === 'list') {
             fetchProducts();
         }
     }, [user, currentView, navigate]);
+
+    const loadFeatures = async () => {
+        try {
+            const response = await developerSettingsSvc.getSettings();
+            const settings = response.data.settings || {};
+            
+            const featuresObj = {};
+            Object.keys(settings).forEach(key => {
+                if (key.startsWith('feature_')) {
+                    featuresObj[key] = settings[key].value;
+                }
+            });
+            
+            setFeatures(featuresObj);
+        } catch (error) {
+            console.error('Erro ao carregar features:', error);
+            // Em caso de erro, manter todas as features ativas
+        }
+    };
 
     const fetchProducts = async () => {
         try {
@@ -147,39 +175,41 @@ const Admin = () => {
                             <button className="btn-add" onClick={() => setCurrentView('category-select')}>
                                 <FaPlus /> Novo Produto
                             </button>
-                            <button className="btn-orders" onClick={() => setCurrentView('orders')}>
-                                <FaShoppingCart /> Vendas
-                            </button>
+                            {features.feature_orders ? (
+                                <button className="btn-orders" onClick={() => setCurrentView('orders')}>
+                                    <FaShoppingCart /> Vendas
+                                </button>
+                            ) : null}
                             {canManageCategories && (
                                 <button className="btn-categories" onClick={() => setCurrentView('categories')}>
                                     <FaTags /> Categorias
                                 </button>
                             )}
-                            {canViewLogs && (
+                            {canViewLogs && features.feature_logs ? (
                                 <button className="btn-logs" onClick={() => setCurrentView('logs')}>
                                     <FaHistory /> Logs
                                 </button>
-                            )}
-                            {(user.role === 'developer' || user.role === 'administrator') && (
-                                <>
-                                    <button className="btn-appearance" onClick={() => setCurrentView('appearance')}>
-                                        <FaPalette /> Aparencia
-                                    </button>
-                                    <button className="btn-export" onClick={() => setCurrentView('export')}>
-                                        <FaFileExport /> Exportar
-                                    </button>
-                                </>
-                            )}
-                            {user.role === 'developer' && (
-                                <>
-                                    <button className="btn-insights" onClick={() => setCurrentView('insights')}>
-                                        <FaChartLine /> Insights
-                                    </button>
-                                    <button className="btn-users" onClick={() => setCurrentView('users')}>
-                                        <FaUsers /> Usuarios
-                                    </button>
-                                </>
-                            )}
+                            ) : null}
+                            {(user.role === 'developer' || user.role === 'administrator') && features.feature_appearance ? (
+                                <button className="btn-appearance" onClick={() => setCurrentView('appearance')}>
+                                    <FaPalette /> Aparencia
+                                </button>
+                            ) : null}
+                            {(user.role === 'developer' || user.role === 'administrator') && features.feature_export ? (
+                                <button className="btn-export" onClick={() => setCurrentView('export')}>
+                                    <FaFileExport /> Exportar
+                                </button>
+                            ) : null}
+                            {user.role === 'developer' && features.feature_insights ? (
+                                <button className="btn-insights" onClick={() => setCurrentView('insights')}>
+                                    <FaChartLine /> Insights
+                                </button>
+                            ) : null}
+                            {user.role === 'developer' && features.feature_users ? (
+                                <button className="btn-users" onClick={() => setCurrentView('users')}>
+                                    <FaUsers /> Usuarios
+                                </button>
+                            ) : null}
                         </>
                     )}
                     {currentView !== 'list' && (
@@ -201,6 +231,7 @@ const Admin = () => {
                     setCurrentView={setCurrentView}
                     canManageCategories={canManageCategories}
                     canViewLogs={canViewLogs}
+                    features={features}
                     onClose={() => setShowMobileMenu(false)}
                     onLogout={handleLogout}
                 />

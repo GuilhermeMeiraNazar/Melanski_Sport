@@ -1,4 +1,23 @@
 const cloudinary = require('../config/cloudinary');
+const credentialsService = require('./credentialsService');
+
+/**
+ * Configura o Cloudinary com credenciais do credentialsService ou .env
+ */
+const configureCloudinary = async () => {
+    try {
+        const credentials = await credentialsService.getCredentials('cloudinary');
+        
+        cloudinary.config({
+            cloud_name: credentials.cloud_name,
+            api_key: credentials.api_key,
+            api_secret: credentials.api_secret
+        });
+    } catch (error) {
+        // Fallback para .env (já configurado no cloudinary.js)
+        console.warn('⚠️ Usando credenciais do Cloudinary do .env (fallback)');
+    }
+};
 
 /**
  * Faz upload de uma imagem para o Cloudinary com redimensionamento e otimização.
@@ -6,6 +25,9 @@ const cloudinary = require('../config/cloudinary');
  */
 const uploadImage = async (base64String) => {
     try {
+        // Configurar Cloudinary com credenciais atualizadas
+        await configureCloudinary();
+        
         // Pega as dimensões do .env ou usa o padrão 800x1000
         const width = parseInt(process.env.IMAGE_WIDTH) || 800;
         const height = parseInt(process.env.IMAGE_HEIGHT) || 1000;
@@ -40,6 +62,9 @@ const uploadImage = async (base64String) => {
 
 const deleteImage = async (publicId) => {
     try {
+        // Configurar Cloudinary com credenciais atualizadas
+        await configureCloudinary();
+        
         const result = await cloudinary.uploader.destroy(publicId);
         return result;
     } catch (error) {

@@ -14,7 +14,8 @@ const MobileMenuDrawer = ({
     currentView, 
     setCurrentView, 
     canManageCategories, 
-    canViewLogs, 
+    canViewLogs,
+    features = {},
     onClose, 
     onLogout 
 }) => {
@@ -45,13 +46,15 @@ const MobileMenuDrawer = ({
                         </button>
                     )}
                     
-                    <button 
-                        className="mobile-menu-item" 
-                        onClick={() => handleNavigation('orders')}
-                    >
-                        <FaShoppingCart />
-                        <span>Vendas</span>
-                    </button>
+                    {features.feature_orders ? (
+                        <button 
+                            className="mobile-menu-item" 
+                            onClick={() => handleNavigation('orders')}
+                        >
+                            <FaShoppingCart />
+                            <span>Vendas</span>
+                        </button>
+                    ) : null}
                     
                     {canManageCategories && (
                         <button 
@@ -63,7 +66,7 @@ const MobileMenuDrawer = ({
                         </button>
                     )}
                     
-                    {canViewLogs && (
+                    {canViewLogs && features.feature_logs ? (
                         <button 
                             className="mobile-menu-item" 
                             onClick={() => handleNavigation('logs')}
@@ -71,43 +74,51 @@ const MobileMenuDrawer = ({
                             <FaHistory />
                             <span>Logs de Atividade</span>
                         </button>
-                    )}
+                    ) : null}
                     
                     {(user.role === 'developer' || user.role === 'administrator') && (
                         <>
-                            <button 
-                                className="mobile-menu-item" 
-                                onClick={() => handleNavigation('appearance')}
-                            >
-                                <FaPalette />
-                                <span>Aparencia</span>
-                            </button>
-                            <button 
-                                className="mobile-menu-item" 
-                                onClick={() => handleNavigation('export')}
-                            >
-                                <FaFileExport />
-                                <span>Exportar Dados</span>
-                            </button>
+                            {features.feature_appearance ? (
+                                <button 
+                                    className="mobile-menu-item" 
+                                    onClick={() => handleNavigation('appearance')}
+                                >
+                                    <FaPalette />
+                                    <span>Aparencia</span>
+                                </button>
+                            ) : null}
+                            {features.feature_export ? (
+                                <button 
+                                    className="mobile-menu-item" 
+                                    onClick={() => handleNavigation('export')}
+                                >
+                                    <FaFileExport />
+                                    <span>Exportar Dados</span>
+                                </button>
+                            ) : null}
                         </>
                     )}
                     
                     {user.role === 'developer' && (
                         <>
-                            <button 
-                                className="mobile-menu-item" 
-                                onClick={() => handleNavigation('insights')}
-                            >
-                                <FaChartLine />
-                                <span>Insights</span>
-                            </button>
-                            <button 
-                                className="mobile-menu-item" 
-                                onClick={() => handleNavigation('users')}
-                            >
-                                <FaUsers />
-                                <span>Usuarios</span>
-                            </button>
+                            {features.feature_insights ? (
+                                <button 
+                                    className="mobile-menu-item" 
+                                    onClick={() => handleNavigation('insights')}
+                                >
+                                    <FaChartLine />
+                                    <span>Insights</span>
+                                </button>
+                            ) : null}
+                            {features.feature_users ? (
+                                <button 
+                                    className="mobile-menu-item" 
+                                    onClick={() => handleNavigation('users')}
+                                >
+                                    <FaUsers />
+                                    <span>Usuarios</span>
+                                </button>
+                            ) : null}
                         </>
                     )}
                     

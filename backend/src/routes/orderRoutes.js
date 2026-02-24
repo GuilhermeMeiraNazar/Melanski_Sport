@@ -5,12 +5,14 @@ const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createOrderSchema, updateStatusSchema } = require('../validators/orderValidator');
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { checkFeature } = require('../middleware/featureCheck');
 
 // Listar pedidos - Apenas Developer, Administrator, Operator
 router.get(
   '/',
   authenticate,
   authorize('developer', 'administrator', 'operator'),
+  checkFeature('feature_orders'),
   apiLimiter,
   orderController.getAll
 );

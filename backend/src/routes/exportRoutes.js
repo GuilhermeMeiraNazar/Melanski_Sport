@@ -3,10 +3,12 @@ const router = express.Router();
 const exportController = require('../controllers/exportController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { checkFeature } = require('../middleware/featureCheck');
 
 // Todas as rotas requerem autenticação e permissão de developer ou administrator
 router.use(authenticate);
 router.use(authorize('developer', 'administrator'));
+router.use(checkFeature('feature_export'));
 
 // Exportar estoque
 router.get('/inventory', apiLimiter, exportController.exportInventory);

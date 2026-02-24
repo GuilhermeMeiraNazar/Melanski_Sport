@@ -118,4 +118,21 @@ export const userManagementSvc = {
     resetPassword: (id) => api.post(`/users/${id}/reset-password`)
 };
 
+// --- SERVIÇO DE CONFIGURAÇÕES DO DEVELOPER ---
+export const developerSettingsSvc = {
+    getSettings: () => api.get('/developer-settings'),
+    updateSetting: (settingKey, settingValue) => api.put('/developer-settings/setting', { settingKey, settingValue }),
+    updateMultipleSettings: (settings) => api.put('/developer-settings/settings', { settings }),
+    checkFeature: (feature) => api.get(`/developer-settings/check/${feature}`),
+    resetToDefaults: () => api.post('/developer-settings/reset')
+};
+
+// --- SERVIÇO DE MERCADO PAGO ---
+export const mercadoPagoSvc = {
+    getPublicKey: () => api.get('/mercadopago/public-key'),
+    createPreference: (orderId) => api.post('/mercadopago/create-preference', { orderId }),
+    getPayment: (paymentId) => api.get(`/mercadopago/payment/${paymentId}`),
+    refundPayment: (paymentId, amount) => api.post(`/mercadopago/refund/${paymentId}`, { amount })
+};
+
 export default api;

@@ -5,9 +5,10 @@ const { authenticate, authorize } = require('../middleware/auth');
 const validate = require('../middleware/validate');
 const { createProductSchema, updateProductSchema } = require('../validators/productValidator');
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { checkResourceLimit } = require('../middleware/featureCheck');
 
 router.get('/', apiLimiter, productController.getAll);
-router.post('/', authenticate, authorize('developer', 'administrator', 'operator'), apiLimiter, validate(createProductSchema), productController.create);
+router.post('/', authenticate, authorize('developer', 'administrator', 'operator'), checkResourceLimit('products'), apiLimiter, validate(createProductSchema), productController.create);
 router.put('/:id', authenticate, authorize('developer', 'administrator', 'operator'), apiLimiter, validate(updateProductSchema), productController.update);
 router.delete('/:id', authenticate, authorize('developer', 'administrator'), apiLimiter, productController.delete);
 

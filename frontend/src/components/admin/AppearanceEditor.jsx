@@ -21,8 +21,10 @@ const AppearanceEditor = () => {
     const [currentColors, setCurrentColors] = useState({});
     const [loading, setLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [allowThemeEditing, setAllowThemeEditing] = useState(false);
+    const [userRole, setUserRole] = useState('');
 
-    // Temas pré-definidos (não editáveis)
+    // Temas pré-definidos (não editáveis por padrão)
     const predefinedThemes = {
         default: {
             name: 'Padrão',
@@ -106,7 +108,32 @@ const AppearanceEditor = () => {
 
     useEffect(() => {
         loadCustomThemes();
+        loadDeveloperSettings();
+        loadUserRole();
     }, []);
+
+    const loadUserRole = () => {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            const user = JSON.parse(savedUser);
+            setUserRole(user.role || '');
+        }
+    };
+
+    const loadDeveloperSettings = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/developer-settings', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            
+            const settings = response.data.settings || {};
+            setAllowThemeEditing(settings.allow_theme_editing?.value || false);
+        } catch (error) {
+            console.error('Erro ao carregar configurações do developer:', error);
+            // Em caso de erro, não permitir edição de temas padrão
+            setAllowThemeEditing(false);
+        }
+    };
 
     const loadCustomThemes = async () => {
         try {
@@ -161,8 +188,12 @@ const AppearanceEditor = () => {
     };
 
     const handleColorChange = (key, value) => {
-        // Só permite editar se for tema personalizado
-        if (activeTheme !== 'custom1' && activeTheme !== 'custom2') {
+        // Verificar se pode editar
+        const isPredefinedTheme = predefinedThemes[activeTheme];
+        const isDeveloper = userRole === 'developer';
+        
+        // Só permite editar temas personalizados OU temas padrão se for developer com permissão
+        if (isPredefinedTheme && !(isDeveloper && allowThemeEditing)) {
             alert('Selecione um tema personalizado para editar as cores');
             return;
         }
@@ -172,42 +203,68 @@ const AppearanceEditor = () => {
             [key]: value
         }));
 
-        // Atualizar também o tema personalizado
-        setCustomThemes(prev => ({
-            ...prev,
-            [activeTheme]: {
-                ...prev[activeTheme],
-                [key]: value
-            }
-        }));
+        // Se for tema personalizado, atualizar também o tema personalizado
+        if (activeTheme === 'custom1' || activeTheme === 'custom2') {
+            setCustomThemes(prev => ({
+                ...prev,
+                [activeTheme]: {
+                    ...prev[activeTheme],
+                    [key]: value
+                }
+            }));
+        }
     };
 
     const handleSaveCustomTheme = async () => {
-        if (activeTheme !== 'custom1' && activeTheme !== 'custom2') {
-            alert('Selecione um tema personalizado para salvar');
-            return;
-        }
+        const isPredefinedTheme = predefinedThemes[activeTheme];
+        const isDeveloper = userRole === 'developer';
 
-        if (!window.confirm(`Salvar alterações no ${activeTheme === 'custom1' ? 'Tema Personalizado 1' : 'Tema Personalizado 2'}?`)) {
+        // Se for tema pré-definido, só developer com permissão pode salvar
+        if (isPredefinedTheme) {
+            if (!isDeveloper || !allowThemeEditing) {
+                alert('Apenas developers com permissão podem editar temas padrão');
+                return;
+            }
+
+            if (!window.confirm(`Salvar alterações no tema ${getThemeName(activeTheme)}? Isso irá sobrescrever o tema padrão.`)) {
+                return;
+            }
+        } else if (activeTheme !== 'custom1' && activeTheme !== 'custom2') {
+            alert('Selecione um tema para salvar');
             return;
+        } else {
+            if (!window.confirm(`Salvar alterações no ${activeTheme === 'custom1' ? 'Tema Personalizado 1' : 'Tema Personalizado 2'}?`)) {
+                return;
+            }
         }
 
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
             
-            await axios.post('http://localhost:3000/api/appearance/save-custom-theme',
-                { 
-                    themeName: activeTheme,
-                    colors: currentColors
-                },
-                { headers: { 'Authorization': `Bearer ${token}` } }
-            );
+            // Se for tema pré-definido, salvar como tema personalizado com nome especial
+            if (isPredefinedTheme) {
+                await axios.post('http://localhost:3000/api/appearance/save-custom-theme',
+                    { 
+                        themeName: `predefined_${activeTheme}`,
+                        colors: currentColors
+                    },
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+            } else {
+                await axios.post('http://localhost:3000/api/appearance/save-custom-theme',
+                    { 
+                        themeName: activeTheme,
+                        colors: currentColors
+                    },
+                    { headers: { 'Authorization': `Bearer ${token}` } }
+                );
+            }
 
-            alert('Tema personalizado salvo com sucesso!');
+            alert('Tema salvo com sucesso!');
         } catch (error) {
             console.error('Erro ao salvar tema:', error);
-            alert('Erro ao salvar tema personalizado');
+            alert('Erro ao salvar tema');
         } finally {
             setLoading(false);
         }
@@ -238,6 +295,13 @@ const AppearanceEditor = () => {
     };
 
     const handleResetCustomTheme = async () => {
+        const isPredefinedTheme = predefinedThemes[activeTheme];
+        
+        if (isPredefinedTheme) {
+            alert('Não é possível resetar temas pré-definidos');
+            return;
+        }
+
         if (activeTheme !== 'custom1' && activeTheme !== 'custom2') {
             alert('Selecione um tema personalizado para resetar');
             return;
@@ -263,6 +327,9 @@ const AppearanceEditor = () => {
     };
 
     const isCustomTheme = activeTheme === 'custom1' || activeTheme === 'custom2';
+    const isPredefinedTheme = predefinedThemes[activeTheme];
+    const isDeveloper = userRole === 'developer';
+    const canEditTheme = isCustomTheme || (isPredefinedTheme && isDeveloper && allowThemeEditing);
 
     const colorGroups = [
         {
@@ -350,15 +417,17 @@ const AppearanceEditor = () => {
                 </button>
 
                 <div className="actions-right">
-                    {isCustomTheme && (
+                    {canEditTheme && (
                         <>
-                            <button 
-                                className="btn-reset" 
-                                onClick={handleResetCustomTheme}
-                                disabled={loading}
-                            >
-                                <FaUndo /> Resetar
-                            </button>
+                            {isCustomTheme && (
+                                <button 
+                                    className="btn-reset" 
+                                    onClick={handleResetCustomTheme}
+                                    disabled={loading}
+                                >
+                                    <FaUndo /> Resetar
+                                </button>
+                            )}
                             <button 
                                 className="btn-save" 
                                 onClick={handleSaveCustomTheme}
@@ -398,7 +467,9 @@ const AppearanceEditor = () => {
                                 </div>
                             </div>
                             <span className="theme-name">{predefinedThemes[themeKey].name}</span>
-                            <span className="theme-badge">Pré-definido</span>
+                            <span className="theme-badge">
+                                {isDeveloper && allowThemeEditing ? 'Editável (Dev)' : 'Pré-definido'}
+                            </span>
                         </button>
                     ))}
 
@@ -428,10 +499,16 @@ const AppearanceEditor = () => {
 
             {/* Info sobre tema selecionado */}
             <div className="theme-info">
-                {!isCustomTheme && (
+                {!canEditTheme && isPredefinedTheme && (
                     <div className="info-box warning">
                         <strong>ℹ️ Tema Pré-definido</strong>
                         <p>Este tema não pode ser editado. Selecione um "Tema Personalizado" para editar as cores.</p>
+                    </div>
+                )}
+                {canEditTheme && isPredefinedTheme && (
+                    <div className="info-box success">
+                        <strong>⚠️ Modo Developer</strong>
+                        <p>Você está editando um tema pré-definido. As alterações serão salvas e aplicadas ao tema padrão.</p>
                     </div>
                 )}
                 {isCustomTheme && (
@@ -459,7 +536,7 @@ const AppearanceEditor = () => {
                                             value={currentColors[color.key] || '#000000'}
                                             onChange={(e) => handleColorChange(color.key, e.target.value)}
                                             className="color-picker"
-                                            disabled={!isCustomTheme}
+                                            disabled={!canEditTheme}
                                         />
                                         <input
                                             type="text"
@@ -467,7 +544,7 @@ const AppearanceEditor = () => {
                                             onChange={(e) => handleColorChange(color.key, e.target.value)}
                                             className="color-text"
                                             placeholder="#000000"
-                                            disabled={!isCustomTheme}
+                                            disabled={!canEditTheme}
                                         />
                                     </div>
                                 </div>

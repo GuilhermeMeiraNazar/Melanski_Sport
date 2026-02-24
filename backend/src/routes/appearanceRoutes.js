@@ -3,6 +3,7 @@ const router = express.Router();
 const appearanceController = require('../controllers/appearanceController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { checkFeature } = require('../middleware/featureCheck');
 
 // Rota pública para obter configurações (para aplicar no site)
 router.get('/settings', apiLimiter, appearanceController.getSettings);
@@ -10,6 +11,7 @@ router.get('/settings', apiLimiter, appearanceController.getSettings);
 // Rotas protegidas (apenas developer e administrator)
 router.use(authenticate);
 router.use(authorize('developer', 'administrator'));
+router.use(checkFeature('feature_appearance'));
 
 // Obter temas personalizados (custom1 e custom2)
 router.get('/custom-themes', apiLimiter, appearanceController.getCustomThemes);

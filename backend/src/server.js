@@ -12,6 +12,9 @@ const orderRoutes = require('./routes/orderRoutes');
 const userManagementRoutes = require('./routes/userManagementRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const appearanceRoutes = require('./routes/appearanceRoutes');
+const developerSettingsRoutes = require('./routes/developerSettingsRoutes');
+const mercadoPagoRoutes = require('./routes/mercadoPagoRoutes');
+const credentialsRoutes = require('./routes/credentials');
 
 // Importação do middleware de erro
 const { errorHandler } = require('./middleware/errorHandler');
@@ -35,6 +38,9 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userManagementRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/appearance', appearanceRoutes);
+app.use('/api/developer-settings', developerSettingsRoutes);
+app.use('/api/mercadopago', mercadoPagoRoutes);
+app.use('/api/credentials', credentialsRoutes);
 
 // Middleware de tratamento de erros (deve ser o último)
 app.use(errorHandler);
