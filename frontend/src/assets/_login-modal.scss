@@ -2,11 +2,12 @@
 .login-modal {
     max-width: 400px;
     padding: 30px;
+    background: var(--background-color);
 
     h2 {
         margin-bottom: 25px;
         text-align: center;
-        color: $vermelho-principal;
+        color: var(--primary-color);
     }
 
     .form-group {
@@ -16,20 +17,26 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: $text-color;
+            color: var(--text-primary);
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: $radius-small;
             font-size: 14px;
             transition: border-color $transition-normal;
+            background: var(--background-secondary);
+            color: var(--text-primary);
 
             &:focus {
                 outline: none;
-                border-color: $vermelho-principal;
+                border-color: var(--primary-color);
+            }
+            
+            &::placeholder {
+                color: var(--text-light);
             }
         }
     }
@@ -47,7 +54,7 @@
     .btn-submit {
         width: 100%;
         padding: 12px;
-        background: $vermelho-principal;
+        background: var(--primary-color);
         color: white;
         border: none;
         border-radius: $radius-small;
@@ -58,7 +65,7 @@
         margin-bottom: 10px;
 
         &:hover:not(:disabled) {
-            background: darken($vermelho-principal, 10%);
+            background: var(--secondary-color);
         }
 
         &:disabled {
@@ -71,7 +78,7 @@
         width: 100%;
         padding: 10px;
         background: transparent;
-        color: $vermelho-principal;
+        color: var(--primary-color);
         border: none;
         font-size: 14px;
         font-weight: 600;
@@ -80,7 +87,7 @@
         text-decoration: underline;
 
         &:hover {
-            color: darken($vermelho-principal, 10%);
+            color: var(--secondary-color);
             transform: translateY(-1px);
         }
     }

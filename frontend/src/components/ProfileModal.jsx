@@ -141,19 +141,6 @@ function ProfileModal({ user, onClose, onUpdate }) {
                             <small>Ao alterar o email, você precisará verificá-lo novamente</small>
                         </div>
 
-                        {user.role !== 'client' && (
-                            <div className="form-group">
-                                <label>Cargo</label>
-                                <input
-                                    type="text"
-                                    value={user.role}
-                                    disabled
-                                    style={{ background: '#f5f5f5', cursor: 'not-allowed' }}
-                                />
-                                <small>O cargo não pode ser alterado</small>
-                            </div>
-                        )}
-
                         <button type="submit" className="btn-save" disabled={loading}>
                             <FaSave /> {loading ? 'Salvando...' : 'Salvar Alterações'}
                         </button>

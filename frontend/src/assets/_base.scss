@@ -1,5 +1,8 @@
 /* _base.scss */
 
+// CSS Variables são aplicadas dinamicamente pelo ThemeContext
+// NÃO definir valores fixos aqui - eles vêm do banco de dados
+
 * {
     margin: 0;
     padding: 0;

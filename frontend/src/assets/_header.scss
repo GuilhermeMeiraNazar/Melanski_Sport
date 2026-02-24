@@ -11,13 +11,13 @@
     top: 0;
     left: 0;
     z-index: 5000;
-    background-color: $preto;
+    background-color: var(--background-dark);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
     .top-bar {
         @include flex-center;
         background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 8%) 100%);
-        color: $branco;
+        color: var(--text-white);
         font-size: 0.75rem;
         padding: 10px 20px;
         display: flex;
@@ -84,7 +84,7 @@
             .admin-btn, .logout-btn {
                 background: rgba(255, 255, 255, 0.15);
                 border: 1px solid rgba(255, 255, 255, 0.25);
-                color: $branco;
+                color: var(--text-white);
                 padding: 6px 14px;
                 border-radius: 6px;
                 cursor: pointer;
@@ -139,15 +139,15 @@
                 h1 {
                     font-size: 1.8rem;
                     font-weight: 900;
-                    color: $branco;
+                    color: var(--text-white);
                     font-style: italic;
                     letter-spacing: -0.5px;
                     margin: 0;
                     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
                     
                     span {
-                        color: $vermelho-principal;
-                        text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+                        color: var(--primary-color);
+                        text-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.5);
                     }
                 }
             }
@@ -155,7 +155,7 @@
             .header-icons {
                 @include flex-center;
                 gap: 20px;
-                color: $branco;
+                color: var(--text-white);
                 align-items: center;
                 margin-left: auto;
 
@@ -204,9 +204,9 @@
                         align-items: center;
                         justify-content: center;
                         font-weight: 900;
-                        color: $branco;
-                        border: 2px solid $preto;
-                        box-shadow: 0 2px 8px rgba(220, 20, 60, 0.4);
+                        color: var(--text-white);
+                        border: 2px solid var(--background-dark);
+                        box-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.4);
                         animation: pulse 2s infinite;
                     }
 

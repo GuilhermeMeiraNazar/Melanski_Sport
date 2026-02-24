@@ -1,8 +1,8 @@
 /* _footer.scss - Modernizado */
 
 .footer {
-    background: linear-gradient(180deg, #0a0a0a 0%, $preto 100%);
-    color: $branco;
+    background: var(--background-dark);
+    color: var(--text-white);
     padding: 40px 20px;
     margin-top: auto;
     width: 100%;
@@ -19,7 +19,7 @@
         height: 2px;
         background: linear-gradient(90deg, 
             transparent 0%, 
-            $vermelho-principal 50%, 
+            var(--primary-color) 50%, 
             transparent 100%
         );
     }
@@ -49,7 +49,7 @@
         .copyright {
             font-weight: 700;
             font-size: 0.95rem;
-            color: $branco;
+            color: var(--text-white);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -57,7 +57,7 @@
             &::before {
                 content: '©';
                 font-size: 1.2rem;
-                color: $vermelho-principal;
+                color: var(--primary-color);
             }
         }
         
@@ -67,7 +67,7 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 8px 12px;
             border-radius: 6px;
-            border-left: 3px solid $vermelho-principal;
+            border-left: 3px solid var(--primary-color);
             font-size: 0.85rem;
         }
         
@@ -108,7 +108,7 @@
                 font-size: 0.8rem;
                 padding: 6px 10px;
                 border-left: none;
-                border-bottom: 3px solid $vermelho-principal;
+                border-bottom: 3px solid var(--primary-color);
             }
 
             .address {

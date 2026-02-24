@@ -11,6 +11,7 @@ const activityLogRoutes = require('./routes/activityLogRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const userManagementRoutes = require('./routes/userManagementRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const appearanceRoutes = require('./routes/appearanceRoutes');
 
 // Importação do middleware de erro
 const { errorHandler } = require('./middleware/errorHandler');
@@ -33,6 +34,7 @@ app.use('/api/store', storeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userManagementRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/appearance', appearanceRoutes);
 
 // Middleware de tratamento de erros (deve ser o último)
 app.use(errorHandler);

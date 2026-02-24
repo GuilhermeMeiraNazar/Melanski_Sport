@@ -113,7 +113,7 @@ const Admin = () => {
     }
 
     return (
-        <div className="admin-container">
+        <div className="admin-container admin-isolated">
             {showDevSettings && (
                 <DevSettingsModal onClose={() => setShowDevSettings(false)} />
             )}

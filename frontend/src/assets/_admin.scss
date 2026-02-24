@@ -1,4 +1,25 @@
 /* _admin.scss */
+
+/* Isolamento CSS para o painel administrativo */
+.admin-isolated {
+    // Sobrescrever CSS Variables com valores fixos para o admin
+    --background-color: #ffffff !important;
+    --background-secondary: #f4f4f4 !important;
+    --background-dark: #2c3e50 !important;
+    --text-primary: #333333 !important;
+    --text-secondary: #666666 !important;
+    --text-light: #999999 !important;
+    --border-color: #ddd !important;
+    --border-light: #eee !important;
+    
+    // Garantir que inputs sempre tenham fundo branco
+    input, textarea, select {
+        background-color: #ffffff !important;
+        color: #333333 !important;
+        border-color: #ddd !important;
+    }
+}
+
 .admin-container {
     min-height: 100vh;
     background-color: #f4f4f4;

@@ -1,7 +1,7 @@
 /* _profile-modal.scss */
 
 .profile-modal-content {
-    background: $branco;
+    background: var(--background-color);
     width: 100%;
     max-width: 500px;
     border-radius: 16px;
@@ -23,13 +23,13 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        color: #666;
+        color: var(--text-light);
         font-size: 1.2rem;
         transition: all 0.2s;
         z-index: 10;
 
         &:hover {
-            background: $vermelho-principal;
+            background: var(--primary-color);
             color: $branco;
             transform: rotate(90deg);
         }
@@ -37,8 +37,8 @@
 }
 
 .profile-modal-header {
-    background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
-    color: $branco;
+    background: var(--primary-color);
+    color: #ffffff;
     padding: 35px 30px 25px;
     text-align: center;
 
@@ -46,26 +46,28 @@
         margin: 0 0 8px 0;
         font-size: 1.8rem;
         font-weight: 800;
+        color: #ffffff;
     }
 
     p {
         margin: 0;
         opacity: 0.9;
         font-size: 0.9rem;
+        color: #ffffff;
     }
 }
 
 .profile-tabs {
     display: flex;
-    background: #f8f9fa;
-    border-bottom: 2px solid #e9ecef;
+    background: var(--background-secondary);
+    border-bottom: 2px solid var(--border-color);
 
     .tab-btn {
         flex: 1;
         padding: 18px 20px;
         border: none;
         background: transparent;
-        color: #666;
+        color: var(--text-secondary);
         font-weight: 700;
         font-size: 0.95rem;
         cursor: pointer;
@@ -78,12 +80,12 @@
 
         &:hover {
             background: rgba(0, 0, 0, 0.02);
-            color: $preto;
+            color: var(--text-primary);
         }
 
         &.active {
-            color: $vermelho-principal;
-            background: $branco;
+            color: var(--primary-color);
+            background: var(--background-color);
 
             &::after {
                 content: '';
@@ -92,7 +94,7 @@
                 left: 0;
                 right: 0;
                 height: 2px;
-                background: $vermelho-principal;
+                background: var(--primary-color);
             }
         }
 
@@ -104,6 +106,7 @@
 
 .profile-modal-body {
     padding: 30px;
+    background: var(--background-color);
 
     form {
         display: flex;
@@ -117,44 +120,46 @@
 
             label {
                 font-weight: 700;
-                color: #333;
+                color: var(--text-primary);
                 font-size: 0.9rem;
                 display: flex;
                 align-items: center;
                 gap: 8px;
 
                 svg {
-                    color: $vermelho-principal;
+                    color: var(--primary-color);
                 }
             }
 
             input {
                 padding: 14px;
-                border: 2px solid #e8e8e8;
+                border: 2px solid var(--border-color);
                 border-radius: 10px;
                 font-size: 0.95rem;
                 transition: all 0.3s;
                 font-family: $font-primary;
+                background: var(--background-secondary);
+                color: var(--text-primary);
 
                 &:focus {
                     outline: none;
-                    border-color: $vermelho-principal;
-                    box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.1);
+                    border-color: var(--primary-color);
+                    box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb, 220, 20, 60), 0.1);
                 }
 
                 &:disabled {
-                    background: #f5f5f5;
+                    background: var(--background-dark);
                     cursor: not-allowed;
-                    color: #999;
+                    color: var(--text-light);
                 }
 
                 &::placeholder {
-                    color: #999;
+                    color: var(--text-light);
                 }
             }
 
             small {
-                color: #666;
+                color: var(--text-secondary);
                 font-size: 0.8rem;
                 margin-top: -4px;
             }
@@ -162,7 +167,7 @@
 
         .btn-save {
             padding: 16px;
-            background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
+            background: var(--primary-color);
             color: $branco;
             border: none;
             border-radius: 10px;
@@ -177,11 +182,12 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb, 220, 20, 60), 0.3);
 
             &:hover:not(:disabled) {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+                box-shadow: 0 6px 20px rgba(var(--primary-color-rgb, 220, 20, 60), 0.4);
+                background: var(--secondary-color);
             }
 
             &:active:not(:disabled) {

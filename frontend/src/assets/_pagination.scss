@@ -26,9 +26,9 @@
         justify-content: center;
         
         &:hover:not(:disabled) {
-            background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
-            color: $branco;
-            border-color: $preto;
+            background: var(--background-dark);
+            color: var(--text-white);
+            border-color: var(--background-dark);
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
@@ -45,10 +45,10 @@
         }
 
         &.active {
-            background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
-            color: $branco;
-            border-color: $vermelho-principal;
-            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+            background: var(--primary-color);
+            color: var(--text-white);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.4);
         }
     }
 
@@ -65,18 +65,18 @@
         text-align: center;
 
         &:hover {
-            background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
-            color: $branco;
-            border-color: $preto;
+            background: var(--background-dark);
+            color: var(--text-white);
+            border-color: var(--background-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         &.active {
-            background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
-            color: $branco;
-            border-color: $vermelho-principal;
-            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+            background: var(--primary-color);
+            color: var(--text-white);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.4);
             transform: translateY(-2px);
         }
     }

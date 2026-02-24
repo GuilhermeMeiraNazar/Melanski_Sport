@@ -6,7 +6,7 @@
 }
 
 .product-card {
-    background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+    background: var(--background-color);
     border-radius: 16px;
     overflow: hidden;
     position: relative;
@@ -16,12 +16,12 @@
     flex-direction: column;
     height: 100%;
     cursor: pointer;
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-color);
 
     &:hover {
         transform: translateY(-8px) scale(1.02);
         box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-        border-color: rgba(220, 20, 60, 0.2);
+        border-color: rgba(var(--primary-color-rgb), 0.2);
     }
 
     &.out-of-stock {
@@ -59,8 +59,8 @@
     }
 
     .badge-offer {
-        background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
-        color: $branco;
+        background: #dc143c;
+        color: #ffffff;
         padding: 6px 12px;
         font-size: 0.7rem;
         font-weight: 800;
@@ -77,8 +77,8 @@
     }
 
     .badge-new {
-        background: linear-gradient(135deg, $verde-lancamento 0%, darken($verde-lancamento, 10%) 100%);
-        color: $branco;
+        background: #2ecc71;
+        color: #ffffff;
         padding: 6px 12px;
         font-size: 0.7rem;
         font-weight: 800;
@@ -89,8 +89,8 @@
     }
 
     .badge-out-of-stock {
-        background: linear-gradient(135deg, #555 0%, #333 100%);
-        color: $branco;
+        background: var(--text-secondary);
+        color: var(--text-white);
         padding: 6px 12px;
         font-size: 0.7rem;
         font-weight: 800;
@@ -102,7 +102,7 @@
 
     .image-container {
         height: 240px;
-        background: linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%);
+        background: var(--background-secondary);
         position: relative;
         flex-shrink: 0;
         display: flex;
@@ -155,9 +155,9 @@
             transition: all 0.3s;
 
             &:hover {
-                color: $vermelho-principal;
+                color: var(--primary-color);
                 transform: scale(1.1);
-                box-shadow: 0 6px 20px rgba(220, 20, 60, 0.3);
+                box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.3);
             }
         }
     }
@@ -168,11 +168,11 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        background: $branco;
+        background: var(--background-color);
 
         .category-tag {
             font-size: 0.7rem;
-            color: #999;
+            color: var(--text-light);
             text-transform: uppercase;
             margin-bottom: 6px;
             font-weight: 600;
@@ -181,7 +181,7 @@
 
         h3 {
             font-size: 1rem;
-            color: $preto;
+            color: var(--text-primary);
             margin-bottom: 12px;
             font-weight: 700;
             line-height: 1.4;
@@ -201,19 +201,19 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            border-top: 1px solid var(--border-color);
 
             .price {
                 font-size: 1.4rem;
                 font-weight: 800;
-                color: $preto;
+                color: var(--text-primary);
                 margin: 0;
                 letter-spacing: -0.5px;
             }
 
             .old-price-card {
                 text-decoration: line-through;
-                color: #999;
+                color: var(--text-light);
                 font-size: 0.9rem;
                 font-weight: 500;
             }
@@ -222,8 +222,8 @@
         .btn-buy {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, $preto 0%, lighten($preto, 10%) 100%);
-            color: $branco;
+            background: var(--background-dark);
+            color: var(--text-white);
             border: none;
             border-radius: 10px;
             font-weight: 700;
@@ -239,9 +239,9 @@
             letter-spacing: 0.5px;
 
             &:hover {
-                background: linear-gradient(135deg, $vermelho-principal 0%, darken($vermelho-principal, 10%) 100%);
+                background: var(--primary-color);
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+                box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.4);
             }
         }
     }

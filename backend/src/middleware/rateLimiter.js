@@ -76,7 +76,7 @@ const createRateLimiter = (options = {}) => {
  */
 const authLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // 5 tentativas
+    max: 10, // 10 tentativas (aumentado para facilitar testes)
     message: 'Muitas tentativas de login. Tente novamente em 15 minutos.'
 });
 

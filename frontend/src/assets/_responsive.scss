@@ -108,8 +108,8 @@
         transition: all 0.2s;
 
         &:hover {
-            background: rgba(220, 20, 60, 0.9);
-            color: $branco;
+            background: var(--primary-color);
+            color: var(--text-white);
         }
     }
     
@@ -122,7 +122,7 @@
             height: 320px; 
             border: none; 
             border-radius: 0;
-            background: $branco;
+            background: var(--background-color);
             padding: 15px;
             
             img { 
@@ -151,7 +151,7 @@
                 border-radius: 3px;
                 
                 &:hover {
-                    background: rgba(220, 20, 60, 0.5);
+                    background: var(--primary-color);
                 }
             }
             
@@ -167,7 +167,7 @@
         border-left: none; 
         border-top: 1px solid #e6e6e6;
         padding: 25px 20px;
-        background: $branco;
+        background: var(--background-color);
 
         .product-header-info h1 {
             font-size: 1.3rem;

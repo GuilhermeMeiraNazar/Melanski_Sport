@@ -1,0 +1,678 @@
+/* _theme-override.scss */
+/* Sobrescreve estilos SASS estáticos com CSS Variables dinâmicas */
+/* IMPORTANTE: Painel Admin NÃO é afetado - mantém cores estáticas */
+/* TODAS as cores vêm do BANCO DE DADOS via CSS Variables */
+
+// ============================================
+// EXCLUSÕES - NÃO APLICAR TEMA DINÂMICO
+// ============================================
+
+// Painel Admin mantém cores estáticas (sempre vermelho)
+.admin-panel,
+.admin-container,
+.admin-page,
+.admin-section,
+.admin-sidebar,
+.admin-content,
+[class*="admin-"],
+body.admin-mode {
+    // Não aplicar tema dinâmico no admin
+    // Admin sempre usa cores estáticas
+}
+
+// ============================================
+// HEADER E NAVEGAÇÃO (SITE PÚBLICO)
+// ============================================
+
+// Barra superior - Cor dinâmica do tema
+.header-container .top-bar,
+.top-bar {
+    background: var(--primary-color);
+    background-image: none;
+}
+
+// Texto da barra superior - Sempre branco para contraste
+.top-bar p,
+.top-bar span,
+.top-bar .top-links {
+    color: #ffffff;
+}
+
+// Botões da barra superior
+.top-bar .admin-btn,
+.top-bar .logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    
+    &:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+}
+
+// Header principal - Manter preto sólido
+.header-container .main-header,
+.main-header {
+    background: #111111;
+    background-image: none;
+}
+
+// Logo "Melanski" - sempre branco
+.logo h1 {
+    color: #ffffff;
+}
+
+// Logo "Sports" - cor do tema (dinâmica)
+.logo h1 span {
+    color: var(--primary-color);
+    text-shadow: 0 0 20px rgba(var(--primary-color-rgb, 220, 20, 60), 0.5);
+}
+
+// Ícones do header - usar cor do tema
+.header-icons .account-icon:hover,
+.header-icons .cart-icon:hover {
+    color: var(--primary-color);
+}
+
+// Badge do carrinho - Cor dinâmica do tema
+.cart-count {
+    background: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb, 220, 20, 60), 0.4);
+    border-color: #111111;
+}
+
+// ============================================
+// FOOTER (SITE PÚBLICO)
+// ============================================
+
+.footer {
+    background: #111111;
+    background-image: none;
+    
+    &::before {
+        background: var(--primary-color);
+        background-image: none;
+    }
+}
+
+.footer-section .cnpj {
+    border-left-color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.footer-section .copyright::before {
+    color: var(--primary-color);
+}
+
+// Garantir texto branco no footer
+.footer,
+.footer p,
+.footer .footer-section,
+.footer .copyright,
+.footer .cnpj,
+.footer .address {
+    color: #ffffff;
+}
+
+// Footer mobile - borda inferior do CNPJ
+@media (max-width: 768px) {
+    .footer-section .cnpj {
+        border-left: none;
+        border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .footer-section .address {
+        border-left: none;
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+// ============================================
+// BOTÕES PRIMÁRIOS (SITE PÚBLICO APENAS)
+// ============================================
+
+// Excluir botões do admin
+body:not(.admin-mode) .btn-primary,
+.home-page .btn-primary,
+.client-page .btn-primary,
+.btn-add-to-cart,
+.btn-buy-now {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    
+    &:hover,
+    &:focus {
+        background: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+}
+
+// ============================================
+// LINKS E TEXTOS COM COR PRIMÁRIA (SITE PÚBLICO)
+// ============================================
+
+body:not(.admin-mode) a:hover,
+.home-page a:hover,
+.client-page a:hover,
+.link-primary,
+.product-card h3:hover,
+.product-name:hover,
+.sidebar-filter-item:hover,
+.text-primary-color {
+    color: var(--primary-color);
+}
+
+// ============================================
+// BADGES E TAGS (SITE PÚBLICO)
+// ============================================
+
+// EXCEÇÃO: "Oferta" e "Lançamento" sempre vermelho (não muda com tema)
+.badge-offer,
+.offer-highlight,
+.badge-lancamento,
+.badge-launch,
+.sidebar-filter-item.offer-highlight {
+    background: #dc143c;
+    color: #ffffff;
+}
+
+// EXCEÇÃO: "NOVO" sempre verde (não muda com tema)
+.badge-new,
+.badge-novo,
+.new-badge {
+    background: #2ecc71;
+    color: #ffffff;
+}
+
+// Outros badges usam cor do tema
+.badge-discount,
+.badge-promo,
+.tag-primary {
+    background: var(--primary-color);
+    color: var(--text-white);
+}
+
+// ============================================
+// PAGINAÇÃO (SITE PÚBLICO)
+// ============================================
+
+.pagination-button.active,
+.pagination-number.active,
+.page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--text-white);
+}
+
+.pagination-button:hover,
+.pagination-number:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+// ============================================
+// BORDAS E ACENTOS (SITE PÚBLICO)
+// ============================================
+
+.sidebar-filter-item.active::before,
+.profile-tab.active::after,
+.nav-tab.active::after,
+.active-indicator {
+    background: var(--primary-color);
+}
+
+.product-card:hover,
+.card:hover,
+.item:hover {
+    border-color: var(--primary-color);
+}
+
+// ============================================
+// INPUTS E FORMULÁRIOS (SITE PÚBLICO)
+// ============================================
+
+body:not(.admin-mode) input:focus,
+body:not(.admin-mode) textarea:focus,
+body:not(.admin-mode) select:focus,
+.home-page input:focus,
+.home-page textarea:focus,
+.home-page select:focus,
+.form-control:focus,
+.input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 220, 20, 60), 0.1);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--primary-color);
+}
+
+// ============================================
+// CORES DE FUNDO DINÂMICAS (SITE PÚBLICO)
+// ============================================
+
+body {
+    background-color: var(--background-secondary);
+}
+
+// Cards de produtos - usar cor do tema
+.product-card,
+.products-grid .product-card,
+.card {
+    background: var(--background-color);
+}
+
+// Sidebar - usar cor do tema
+.sidebar,
+.sidebar-filters,
+.filter-panel {
+    background: var(--background-color);
+}
+
+// Modais - usar cor do tema
+.modal-content:not(.admin-modal) {
+    background: var(--background-color);
+}
+
+// Modal Gallery (lado esquerdo)
+.modal-gallery {
+    background: var(--background-color);
+}
+
+// Modal Details (lado direito)
+.modal-details {
+    background: var(--background-color);
+    border-left-color: var(--border-color);
+}
+
+// Frame da foto principal
+.main-photo-frame {
+    background: var(--background-secondary);
+    border-color: var(--border-color);
+}
+
+// Thumbnails
+.thumb-item {
+    background: var(--background-secondary);
+    border-color: var(--border-color);
+}
+
+// Carrinho - usar cor do tema
+.cart-sidebar {
+    background: var(--background-color);
+}
+
+.cart-header {
+    background: var(--background-color);
+    border-bottom-color: var(--border-color);
+    
+    h2 {
+        color: var(--text-primary);
+    }
+    
+    .close-btn {
+        color: var(--text-primary);
+        
+        &:hover {
+            color: var(--primary-color);
+        }
+    }
+}
+
+.cart-items-wrapper {
+    background: var(--background-secondary);
+}
+
+.cart-item-card {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+.cart-footer {
+    background: var(--background-color);
+    border-top-color: var(--border-color);
+}
+
+// Inputs e formulários
+input:not(.admin-mode input):not([type="checkbox"]):not([type="radio"]),
+textarea:not(.admin-mode textarea),
+select:not(.admin-mode select),
+.form-control,
+.search-box input {
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+// Botões de tamanho - cores fixas
+.size-button,
+.size-label span,
+.size-grid .size-label span,
+.size-selector .size-opt {
+    background: #f5f5f5;
+    color: #333333;
+    border-color: var(--border-color);
+    
+    &:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    &.selected {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: var(--text-white);
+    }
+}
+
+// Botão "Adicionar ao carrinho" - cores fixas
+.btn-add-cart,
+.action-buttons .btn-add-cart {
+    background: #f5f5f5;
+    color: #333333;
+    border: 2px solid var(--border-color);
+    
+    &:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #ffffff;
+    }
+}
+
+// Controle de quantidade - cores fixas
+.qty-control {
+    background: #f5f5f5;
+    border-color: var(--border-color);
+    
+    button {
+        background: transparent;
+        color: #333333;
+        
+        &:hover {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+    }
+    
+    span {
+        color: #333333;
+    }
+}
+
+// ============================================
+// CORES DE TEXTO DINÂMICAS (SITE PÚBLICO)
+// ============================================
+
+.product-card h3,
+.product-name,
+h1, h2, h3, h4, h5, h6,
+.title,
+.heading {
+    color: var(--text-primary);
+}
+
+.product-description,
+.product-details,
+p,
+.text,
+.description {
+    color: var(--text-secondary);
+}
+
+.text-light,
+.subtitle,
+.caption {
+    color: var(--text-light);
+}
+
+label,
+.checkbox-label,
+.filter-group h4 {
+    color: var(--text-primary);
+}
+
+.product-price,
+.price {
+    color: var(--text-primary);
+}
+
+// ============================================
+// CORES DE BORDAS DINÂMICAS (SITE PÚBLICO)
+// ============================================
+
+.product-card,
+.cart-item-card,
+.modal-content:not(.admin-modal),
+input,
+textarea,
+select,
+.form-control,
+.border,
+.card {
+    border-color: var(--border-color);
+}
+
+// ============================================
+// CORES DE STATUS (SITE PÚBLICO)
+// ============================================
+
+.success-message,
+.btn-success,
+.alert-success,
+.status-success {
+    background: var(--success-color);
+    color: var(--text-white);
+}
+
+.warning-message,
+.btn-warning,
+.alert-warning,
+.status-warning {
+    background: var(--warning-color);
+    color: var(--text-primary);
+}
+
+.error-message,
+.btn-danger,
+.alert-danger,
+.status-error {
+    background: var(--error-color);
+    color: var(--text-white);
+}
+
+.info-message,
+.btn-info,
+.alert-info,
+.status-info {
+    background: var(--info-color);
+    color: var(--text-white);
+}
+
+// ============================================
+// SOMBRAS COM COR PRIMÁRIA (SITE PÚBLICO)
+// ============================================
+
+.product-card:hover,
+body:not(.admin-mode) .btn-primary:hover,
+.card:hover {
+    box-shadow: 0 6px 20px rgba(var(--primary-color-rgb, 220, 20, 60), 0.3);
+}
+
+// ============================================
+// SIDEBAR E FILTROS (SITE PÚBLICO)
+// ============================================
+
+// Barra ao lado de "FILTRAR POR"
+.filter-header h3::before {
+    background: var(--primary-color);
+}
+
+// Scrollbar hover
+.sidebar-filters::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+// Checkboxes
+.checkbox-label input {
+    accent-color: var(--primary-color);
+}
+
+// Itens normais da sidebar
+.sidebar-filter-item:hover,
+.checkbox-label:hover {
+    color: var(--primary-color);
+    background: rgba(var(--primary-color-rgb, 220, 20, 60), 0.05);
+}
+
+// EXCEÇÃO: "Oferta" sempre vermelho (não muda com tema)
+.sidebar-filter-item.offer-highlight,
+.checkbox-label.offer-highlight {
+    color: #dc143c;
+    background: rgba(220, 20, 60, 0.08);
+}
+
+// "Lançamento" sempre verde (não muda com tema)
+.checkbox-label.launch-highlight {
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.08);
+}
+
+// Input de busca em foco
+.search-box input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb, 220, 20, 60), 0.1);
+}
+
+// Botões de tamanho
+.size-label span:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(var(--primary-color-rgb, 220, 20, 60), 0.2);
+}
+
+// Botão de limpar filtros - cores fixas
+.btn-clear-filters {
+    background: #f5f5f5;
+    color: #333333;
+    border: 2px solid var(--border-color);
+    
+    &:hover {
+        background: var(--primary-color);
+        color: #ffffff;
+        border-color: var(--primary-color);
+    }
+}
+
+// Botão flutuante mobile
+.btn-floating-filters,
+.mobile-filter-btn {
+    background: var(--primary-color);
+    color: var(--text-white);
+    box-shadow: 0 8px 25px rgba(var(--primary-color-rgb, 220, 20, 60), 0.5);
+    
+    &:hover {
+        box-shadow: 0 12px 35px rgba(var(--primary-color-rgb, 220, 20, 60), 0.6);
+    }
+}
+
+// Botão de fechar mobile
+.close-mobile {
+    background: rgba(var(--primary-color-rgb, 220, 20, 60), 0.1);
+    color: var(--primary-color);
+    
+    &:hover {
+        background: var(--primary-color);
+        color: var(--text-white);
+    }
+}
+
+// ============================================
+// PRODUTOS (SITE PÚBLICO)
+// ============================================
+
+.product-price-discount,
+.price-discount {
+    color: var(--primary-color);
+}
+
+.product-card .btn-add-to-cart {
+    background: var(--primary-color);
+    
+    &:hover {
+        background: var(--secondary-color);
+    }
+}
+
+// ============================================
+// CARRINHO (SITE PÚBLICO)
+// ============================================
+
+.cart-badge {
+    background: var(--accent-color);
+}
+
+// ============================================
+// MODAL (SITE PÚBLICO)
+// ============================================
+
+.modal-header:not(.admin-modal .modal-header) {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer:not(.admin-modal .modal-footer) {
+    border-top-color: var(--border-color);
+}
+
+.modal-close:not(.admin-modal .modal-close) {
+    color: var(--text-primary);
+    
+    &:hover {
+        color: var(--primary-color);
+    }
+}
+
+// ============================================
+// LOADING E SPINNERS (SITE PÚBLICO)
+// ============================================
+
+body:not(.admin-mode) .spinner,
+body:not(.admin-mode) .loading-spinner {
+    border-top-color: var(--primary-color);
+}
+
+// ============================================
+// TABS E NAVEGAÇÃO (SITE PÚBLICO)
+// ============================================
+
+body:not(.admin-mode) .tab.active,
+body:not(.admin-mode) .nav-tab.active {
+    color: var(--primary-color);
+    background: var(--background-color);
+}
+
+// ============================================
+// BOTÕES DE TAMANHO (SITE PÚBLICO)
+// ============================================
+
+.size-button.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--text-white);
+}
+
+.size-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+// ============================================
+// RESPONSIVIDADE
+// ============================================
+
+@media (max-width: 768px) {
+    .header-container .top-bar,
+    .header-container .main-header {
+        // Manter cores dinâmicas em mobile
+    }
+}
