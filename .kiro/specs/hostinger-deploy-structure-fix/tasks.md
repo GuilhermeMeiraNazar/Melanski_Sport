@@ -1,0 +1,102 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Fault Condition** - Deploy Structure Validation
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: Test concrete failing cases - deploy with files in root, empty public_html, missing validation
+  - Test that deploy script validates structure: all build artifacts (index.html, assets/, vite.svg) must be exclusively in public_html
+  - Test that deploy script blocks push when structure is incorrect
+  - Test that deploy script cleans incorrect files from root before build
+  - Run test on UNFIXED code (current deploy.bat without validation)
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found:
+    - Deploy allows push even with files in root
+    - Deploy doesn't validate public_html contents
+    - Deploy doesn't clean root before build
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Existing Build and Git Workflow
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy operations:
+    - Build process generates files in public_html (vite.config.js with outDir: '../public_html')
+    - Git operations (add, commit, push) work correctly
+    - Source code structure (backend/, frontend/, scripts/) remains in root
+    - Environment files (.env) remain in root
+    - Dependencies (node_modules/) remain in root
+  - Write property-based tests capturing observed behavior patterns:
+    - For all build operations, output goes to public_html
+    - For all Git operations, commands execute successfully
+    - For all source files, location remains unchanged in root
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [x] 3. Fix for Hostinger Deploy Structure
+
+  - [x] 3.1 Modify deploy.bat script to add structure validation
+    - Add pre-build cleanup: remove index.html, assets/, vite.svg from root if they exist
+    - Add post-build validation: verify public_html/index.html exists
+    - Add post-build validation: verify public_html/assets/ exists
+    - Add post-build validation: verify build artifacts are NOT in root
+    - Add validation failure handling: abort push if structure is incorrect
+    - Add informative messages: display validation status and file locations
+    - Add comments documenting each step of the process
+    - _Bug_Condition: isBugCondition(deployState) where build artifacts exist in root OR not all in public_html OR public_html is empty_
+    - _Expected_Behavior: All build artifacts exclusively in public_html, push blocked if validation fails, automatic cleanup of root_
+    - _Preservation: Build process, Git operations, and source structure remain unchanged_
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 3.5_
+
+  - [x] 3.2 Verify vite.config.js is correctly configured
+    - Confirm outDir is set to '../public_html'
+    - Confirm emptyOutDir is set to true
+    - No changes needed if already correct
+    - _Requirements: 2.1, 3.1_
+
+  - [x] 3.3 Create deploy documentation
+    - Create DEPLOY_CHECKLIST.md in .kiro/specs/hostinger-deploy-structure-fix/
+    - Document pre-deploy checklist
+    - Document expected file structure (root vs public_html)
+    - Document how to validate manually in Hostinger panel
+    - Document common troubleshooting scenarios
+    - Document what to do if validation fails
+    - _Requirements: 2.5_
+
+  - [x] 3.4 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Deploy Structure Validation
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify deploy script validates structure correctly
+    - Verify deploy script blocks push when structure is incorrect
+    - Verify deploy script cleans root before build
+    - Verify all build artifacts are exclusively in public_html after deploy
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+
+  - [x] 3.5 Verify preservation tests still pass
+    - **Property 2: Preservation** - Existing Build and Git Workflow
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm build process still generates files in public_html
+    - Confirm Git operations still work correctly
+    - Confirm source code structure remains unchanged
+    - Confirm environment files remain in root
+    - Confirm all tests still pass after fix (no regressions)
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Run all exploration tests - should PASS (bug is fixed)
+  - Run all preservation tests - should PASS (no regressions)
+  - Verify deploy script works end-to-end
+  - Verify documentation is complete and accurate
+  - Test deploy in a clean environment to simulate first-time deploy
+  - Test deploy with existing structure to simulate subsequent deploys
+  - If any issues arise, document them and ask the user for guidance
