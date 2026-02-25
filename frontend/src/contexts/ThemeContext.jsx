@@ -21,7 +21,8 @@ export const ThemeProvider = ({ children }) => {
 
     const loadTheme = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/appearance/settings');
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+            const response = await axios.get(`${API_URL}/appearance/settings`);
             const settings = response.data.settings;
 
             // Converter para objeto simples

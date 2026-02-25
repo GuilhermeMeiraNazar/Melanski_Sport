@@ -661,7 +661,24 @@
                 }
 
                 &::placeholder {
-                    color: rgba(255, 255, 255, 0.4);
+                    color: #a0a0a0 !important;
+                    opacity: 1 !important;
+                    font-style: italic;
+                }
+
+                &::-webkit-input-placeholder {
+                    color: #a0a0a0 !important;
+                    opacity: 1 !important;
+                }
+
+                &::-moz-placeholder {
+                    color: #a0a0a0 !important;
+                    opacity: 1 !important;
+                }
+
+                &:-ms-input-placeholder {
+                    color: #a0a0a0 !important;
+                    opacity: 1 !important;
                 }
             }
 
@@ -781,6 +798,18 @@
         &:hover:not(:disabled) {
             background: linear-gradient(135deg, #00d4e6 0%, #00a7b9 100%);
             box-shadow: 0 6px 16px rgba(0, 188, 212, 0.6);
+        }
+    }
+
+    .btn-reset-credentials {
+        background: linear-gradient(135deg, #ff5722 0%, #e64a19 100%);
+        border-color: #ff5722;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ff6e40 0%, #f4511e 100%);
+            box-shadow: 0 6px 16px rgba(255, 87, 34, 0.6);
         }
     }
 }

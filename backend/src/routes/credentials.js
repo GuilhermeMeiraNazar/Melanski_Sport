@@ -22,6 +22,7 @@ router.get('/:service', credentialsController.getCredentials);
 router.put('/:service', credentialsController.updateCredentials);
 router.post('/test/:service', credentialsController.testConnection);
 router.delete('/:service', credentialsController.deleteCredentials);
+router.post('/reset-all', credentialsController.resetAllCredentials); // Nova rota de reset
 router.get('/:service/audit', credentialsController.getAuditHistory);
 
 module.exports = router;

@@ -6,7 +6,7 @@ import LazyImage from './LazyImage';
 
 function ProductCard({ product, handleProductClick }) {
     // URL base da sua API
-    const API_URL = 'http://localhost:3000'; 
+    const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'; 
 
     // LÓGICA DE IMAGEM
     const mainImage = product.images && product.images.length > 0 

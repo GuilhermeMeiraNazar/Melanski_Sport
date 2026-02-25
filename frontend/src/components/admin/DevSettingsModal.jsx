@@ -22,6 +22,7 @@ const DevSettingsModal = ({ onClose }) => {
     const [testing, setTesting] = useState(false);
     const [testResult, setTestResult] = useState(null);
     const [savingCredentials, setSavingCredentials] = useState(false);
+    const [resettingAll, setResettingAll] = useState(false);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -151,7 +152,14 @@ const DevSettingsModal = ({ onClose }) => {
             });
             
             if (response.data.credentials) {
-                setCredentials(response.data.credentials);
+                // Limpar valores mascarados (****) para permitir edição
+                const cleanedCredentials = {};
+                Object.keys(response.data.credentials).forEach(key => {
+                    const value = response.data.credentials[key];
+                    // Se o valor for mascarado (****), deixar vazio para permitir edição
+                    cleanedCredentials[key] = (value === '****' || value.includes('****')) ? '' : value;
+                });
+                setCredentials(cleanedCredentials);
             } else {
                 setCredentials(getEmptyCredentials(service));
             }
@@ -165,11 +173,11 @@ const DevSettingsModal = ({ onClose }) => {
         const templates = {
             email: {
                 host: '',
-                port: '587',
-                secure: 'false',
+                port: '',
+                secure: '',
                 user: '',
                 password: '',
-                from_name: 'Melanski Sport'
+                from_name: ''
             },
             cloudinary: {
                 cloud_name: '',
@@ -186,8 +194,8 @@ const DevSettingsModal = ({ onClose }) => {
                 api_token: ''
             },
             urls: {
-                frontend_url: 'http://localhost:5173',
-                backend_url: 'http://localhost:3000'
+                frontend_url: '',
+                backend_url: ''
             },
             jwt: {
                 secret: ''
@@ -269,6 +277,38 @@ const DevSettingsModal = ({ onClose }) => {
         }
     };
 
+    const handleResetAllCredentials = async () => {
+        if (!window.confirm('⚠️ ATENÇÃO: Isso irá DELETAR TODAS as credenciais configuradas!\n\nEsta ação é irreversível e deve ser usada apenas ao configurar um novo cliente.\n\nDeseja continuar?')) {
+            return;
+        }
+
+        // Confirmação dupla para segurança
+        if (!window.confirm('Confirme novamente: Deletar TODAS as credenciais?')) {
+            return;
+        }
+
+        try {
+            setResettingAll(true);
+            const token = localStorage.getItem('token');
+            
+            await axios.post(
+                `${API_URL}/credentials/reset-all`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            alert('✅ Todas as credenciais foram resetadas com sucesso!');
+            setTestResult(null);
+            setCredentials({});
+            await loadServices(); // Recarregar lista de serviços
+        } catch (error) {
+            console.error('Erro ao resetar:', error);
+            alert(error.response?.data?.message || 'Erro ao resetar credenciais');
+        } finally {
+            setResettingAll(false);
+        }
+    };
+
     const getServiceInfo = (service) => {
         const info = {
             email: {
@@ -305,38 +345,109 @@ const DevSettingsModal = ({ onClose }) => {
         return info[service] || { icon: '⚙️', name: service, description: '' };
     };
 
+    const getFieldPlaceholder = (field, service) => {
+        // Placeholders específicos por serviço e campo
+        const placeholders = {
+            email: {
+                host: 'Ex: smtp.gmail.com',
+                port: 'Ex: 587',
+                secure: 'Ex: false',
+                user: 'Ex: seu_email@gmail.com',
+                password: 'Senha de App (não a senha do email)',
+                from_name: 'Ex: Nome da Loja'
+            },
+            cloudinary: {
+                cloud_name: 'Ex: seu_cloud_name',
+                api_key: 'Ex: 123456789012345',
+                api_secret: '••••••••'
+            },
+            mercadopago: {
+                access_token: '••••••••',
+                public_key: 'Ex: APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+                webhook_secret: '••••••••'
+            },
+            whatsapp: {
+                phone_number: 'Ex: +5511999999999',
+                api_token: '••••••••'
+            },
+            urls: {
+                frontend_url: 'Ex: https://seudominio.com',
+                backend_url: 'Ex: https://seudominio.com/api'
+            },
+            jwt: {
+                secret: '••••••••'
+            }
+        };
+
+        const placeholder = placeholders[service]?.[field];
+        if (placeholder) {
+            return placeholder;
+        }
+        
+        // Fallback genérico
+        return `Digite ${field.split('_').join(' ')}`;
+    };
+
     const renderCredentialFields = () => {
         const fields = Object.keys(credentials);
         const isPasswordField = (field) => {
-            return field.includes('password') || field.includes('secret') || 
-                   field.includes('token') || field.includes('key');
+            const fieldLower = field.toLowerCase();
+            return fieldLower.includes('password') || fieldLower.includes('secret') || 
+                   fieldLower.includes('token') || fieldLower.includes('key') || 
+                   fieldLower.includes('api_secret');
         };
 
-        return fields.map(field => (
-            <div key={field} className="credential-field">
-                <label>
-                    {field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                </label>
-                <div className="input-with-toggle">
-                    <input
-                        type={isPasswordField(field) && !showPasswords[field] ? 'password' : 'text'}
-                        value={credentials[field] || ''}
-                        onChange={(e) => handleCredentialChange(field, e.target.value)}
-                        placeholder={`Digite ${field}`}
-                        disabled={savingCredentials || testing}
-                    />
-                    {isPasswordField(field) && (
-                        <button
-                            type="button"
-                            className="toggle-visibility"
-                            onClick={() => togglePasswordVisibility(field)}
-                        >
-                            {showPasswords[field] ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                    )}
+        console.log('🔍 Renderizando campos de credenciais:', {
+            selectedService,
+            credentials,
+            fields
+        });
+
+        return fields.map(field => {
+            const shouldHide = isPasswordField(field) && !showPasswords[field];
+            const fieldValue = typeof credentials[field] === 'object' 
+                ? JSON.stringify(credentials[field]) 
+                : (credentials[field] ?? '');
+            const placeholder = getFieldPlaceholder(field, selectedService);
+            
+            // Label customizada para o campo password do email
+            let fieldLabel = field.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            if (selectedService === 'email' && field === 'password') {
+                fieldLabel = 'Password (Senha de App)';
+            }
+            
+            console.log(`📝 Campo ${field}:`, {
+                value: fieldValue,
+                placeholder,
+                isEmpty: fieldValue === ''
+            });
+            
+            return (
+                <div key={field} className="credential-field">
+                    <label>
+                        {fieldLabel}
+                    </label>
+                    <div className="input-with-toggle">
+                        <input
+                            type={shouldHide ? 'password' : 'text'}
+                            value={fieldValue}
+                            onChange={(e) => handleCredentialChange(field, e.target.value)}
+                            placeholder={placeholder}
+                            disabled={savingCredentials || testing}
+                        />
+                        {isPasswordField(field) && (
+                            <button
+                                type="button"
+                                className="toggle-visibility"
+                                onClick={() => togglePasswordVisibility(field)}
+                            >
+                                {showPasswords[field] ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </div>
-        ));
+            );
+        });
     };
 
     const featureSettings = [
@@ -661,7 +772,7 @@ const DevSettingsModal = ({ onClose }) => {
                                         <button
                                             className="btn-test-credentials"
                                             onClick={handleTestCredentials}
-                                            disabled={savingCredentials || testing}
+                                            disabled={savingCredentials || testing || resettingAll}
                                         >
                                             {testing ? (
                                                 <>
@@ -674,7 +785,7 @@ const DevSettingsModal = ({ onClose }) => {
                                         <button
                                             className="btn-save-credentials"
                                             onClick={handleSaveCredentials}
-                                            disabled={savingCredentials || testing}
+                                            disabled={savingCredentials || testing || resettingAll}
                                         >
                                             {savingCredentials ? (
                                                 <>
@@ -683,6 +794,21 @@ const DevSettingsModal = ({ onClose }) => {
                                             ) : (
                                                 <>
                                                     <FaSave /> Salvar Credenciais
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            className="btn-reset-credentials"
+                                            onClick={handleResetAllCredentials}
+                                            disabled={savingCredentials || testing || resettingAll}
+                                        >
+                                            {resettingAll ? (
+                                                <>
+                                                    <FaSpinner className="spinner" /> Resetando...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaUndo /> Resetar Todas
                                                 </>
                                             )}
                                         </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaFileExport, FaBoxOpen, FaTags, FaHistory, FaUsers, FaDownload, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
+import { BASE_URL } from '../../config/api';
 
 /**
  * Gerenciador de Exportação de Dados
@@ -26,7 +27,7 @@ const ExportManager = () => {
                 logs: '/api/export/activity-logs'
             };
 
-            const response = await axios.get(`http://localhost:3000${endpoints[type]}`, {
+            const response = await axios.get(`${BASE_URL}${endpoints[type]}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },

@@ -182,6 +182,32 @@ const credentialsController = {
         res.json({ success: true, message: 'Credenciais removidas com sucesso' });
     }),
 
+    // Resetar TODAS as credenciais (para novo cliente)
+    resetAllCredentials: asyncHandler(async (req, res) => {
+        // Deletar todas as credenciais
+        const [result] = await db.execute('DELETE FROM system_credentials');
+
+        // Registrar no audit log
+        await auditLogService.logCredentialChange(
+            'ALL_SERVICES',
+            'reset_all',
+            req.user.id,
+            {
+                name: req.user.full_name,
+                email: req.user.email,
+                ip: req.ip,
+                userAgent: req.get('user-agent')
+            },
+            true,
+            `Resetadas ${result.affectedRows} credenciais`
+        );
+
+        res.json({ 
+            success: true, 
+            message: `Todas as credenciais foram resetadas (${result.affectedRows} serviços limpos)` 
+        });
+    }),
+
     // Obter histórico de auditoria
     getAuditHistory: asyncHandler(async (req, res) => {
         const { service } = req.params;

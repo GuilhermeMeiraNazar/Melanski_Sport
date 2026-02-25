@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaPalette, FaUndo, FaSave, FaEye, FaTimes, FaEdit } from 'react-icons/fa';
 import axios from 'axios';
 import { useTheme } from '../../contexts/ThemeContext';
+import { API_URL } from '../../config/api';
 
 /**
  * Editor de Aparência
@@ -122,7 +123,7 @@ const AppearanceEditor = () => {
 
     const loadDeveloperSettings = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/developer-settings', {
+            const response = await axios.get(`${API_URL}/developer-settings`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             
@@ -141,7 +142,7 @@ const AppearanceEditor = () => {
             const token = localStorage.getItem('token');
             
             // Carregar temas personalizados
-            const themesResponse = await axios.get('http://localhost:3000/api/appearance/custom-themes', {
+            const themesResponse = await axios.get(`${API_URL}/appearance/custom-themes`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -152,7 +153,7 @@ const AppearanceEditor = () => {
             });
 
             // Carregar tema ativo
-            const activeThemeResponse = await axios.get('http://localhost:3000/api/appearance/active-theme', {
+            const activeThemeResponse = await axios.get(`${API_URL}/appearance/active-theme`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
@@ -244,7 +245,7 @@ const AppearanceEditor = () => {
             
             // Se for tema pré-definido, salvar como tema personalizado com nome especial
             if (isPredefinedTheme) {
-                await axios.post('http://localhost:3000/api/appearance/save-custom-theme',
+                await axios.post(`${API_URL}/appearance/save-custom-theme`,
                     { 
                         themeName: `predefined_${activeTheme}`,
                         colors: currentColors
@@ -252,7 +253,7 @@ const AppearanceEditor = () => {
                     { headers: { 'Authorization': `Bearer ${token}` } }
                 );
             } else {
-                await axios.post('http://localhost:3000/api/appearance/save-custom-theme',
+                await axios.post(`${API_URL}/appearance/save-custom-theme`,
                     { 
                         themeName: activeTheme,
                         colors: currentColors
@@ -279,7 +280,7 @@ const AppearanceEditor = () => {
             setLoading(true);
             const token = localStorage.getItem('token');
             
-            await axios.post('http://localhost:3000/api/appearance/apply-active-theme',
+            await axios.post(`${API_URL}/appearance/apply-active-theme`,
                 { theme: activeTheme },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
