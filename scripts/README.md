@@ -1,6 +1,6 @@
 # Scripts de Gerenciamento - Melanski Sports
 
-Scripts para facilitar o gerenciamento dos servidores backend e frontend.
+Scripts para facilitar o gerenciamento dos servidores backend e frontend, e deploy para produção.
 
 ## 📁 Estrutura
 
@@ -10,11 +10,38 @@ scripts/
 ├── stop.bat        # Parar servidores (Windows)
 ├── restart.bat     # Reiniciar servidores (Windows)
 ├── status.bat      # Ver status (Windows)
+├── deploy.bat      # Deploy para Hostinger (Windows)
 ├── start.sh        # Iniciar servidores (Linux/Mac)
 ├── stop.sh         # Parar servidores (Linux/Mac)
 ├── restart.sh      # Reiniciar servidores (Linux/Mac)
-└── status.sh       # Ver status (Linux/Mac)
+├── status.sh       # Ver status (Linux/Mac)
+└── deploy.sh       # Deploy para Hostinger (Linux/Mac)
 ```
+
+## 🚀 Deploy para Produção (Hostinger)
+
+### Windows
+
+```cmd
+scripts\deploy.bat "Mensagem do commit"
+```
+
+### Linux/Mac
+
+```bash
+bash scripts/deploy.sh "Mensagem do commit"
+```
+
+O que faz:
+- Faz o build do frontend (gera arquivos em `public_html`)
+- Adiciona todos os arquivos ao Git
+- Faz commit com a mensagem fornecida
+- Faz push para o repositório
+- Exibe instruções para finalizar o deploy na Hostinger
+
+**Documentação completa de deploy**: Veja `Kiro/DEPLOY_HOSTINGER.md` e `Kiro/GUIA_RAPIDO_DEPLOY.md`
+
+---
 
 ## 🪟 Windows
 

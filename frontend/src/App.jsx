@@ -48,7 +48,7 @@ function App() {
 
     return (
         <CacheProvider>
-            <Router basename="/Melanski_Sport">
+            <Router>
                 <Suspense fallback={<PageLoader />}>
                     <Routes>
                         <Route path="/" element={

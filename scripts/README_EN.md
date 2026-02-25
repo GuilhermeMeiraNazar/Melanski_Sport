@@ -1,6 +1,6 @@
 # Server Management Scripts - Melanski Sports
 
-Scripts to facilitate backend and frontend server management.
+Scripts to facilitate backend and frontend server management, and production deployment.
 
 ## 📁 Structure
 
@@ -10,11 +10,38 @@ scripts/
 ├── stop.bat        # Stop servers (Windows)
 ├── restart.bat     # Restart servers (Windows)
 ├── status.bat      # Check status (Windows)
+├── deploy.bat      # Deploy to Hostinger (Windows)
 ├── start.sh        # Start servers (Linux/Mac)
 ├── stop.sh         # Stop servers (Linux/Mac)
 ├── restart.sh      # Restart servers (Linux/Mac)
-└── status.sh       # Check status (Linux/Mac)
+├── status.sh       # Check status (Linux/Mac)
+└── deploy.sh       # Deploy to Hostinger (Linux/Mac)
 ```
+
+## 🚀 Production Deploy (Hostinger)
+
+### Windows
+
+```cmd
+scripts\deploy.bat "Commit message"
+```
+
+### Linux/Mac
+
+```bash
+bash scripts/deploy.sh "Commit message"
+```
+
+What it does:
+- Builds the frontend (generates files in `public_html`)
+- Adds all files to Git
+- Commits with the provided message
+- Pushes to the repository
+- Displays instructions to finalize deployment on Hostinger
+
+**Complete deployment documentation**: See `Kiro/DEPLOY_HOSTINGER.md` and `Kiro/GUIA_RAPIDO_DEPLOY.md`
+
+---
 
 ## 🪟 Windows
 
@@ -227,6 +254,7 @@ Install Node.js: https://nodejs.org/
 | Stop | `scripts\stop.bat` | `./scripts/stop.sh` |
 | Restart | `scripts\restart.bat` | `./scripts/restart.sh` |
 | Status | `scripts\status.bat` | `./scripts/status.sh` |
+| Deploy | `scripts\deploy.bat "message"` | `bash scripts/deploy.sh "message"` |
 
 ## 🎯 Features
 

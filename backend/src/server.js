@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 // Importação das rotas
@@ -28,6 +29,9 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Servir arquivos estáticos do frontend (build do Vite)
+app.use(express.static(path.join(__dirname, '../../public_html')));
+
 // Rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -41,6 +45,13 @@ app.use('/api/appearance', appearanceRoutes);
 app.use('/api/developer-settings', developerSettingsRoutes);
 app.use('/api/mercadopago', mercadoPagoRoutes);
 app.use('/api/credentials', credentialsRoutes);
+
+// Rota curinga para servir o index.html do React (deve vir DEPOIS das rotas de API)
+app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, '../../public_html', 'index.html'));
+    }
+});
 
 // Middleware de tratamento de erros (deve ser o último)
 app.use(errorHandler);
