@@ -1,34 +1,45 @@
 {
-  "name": "melanski-sport",
-  "version": "1.0.0",
-  "description": "Melanski Sport - Catálogo de produtos esportivos (Monorepo)",
-  "private": true,
-  "workspaces": [
-    "backend",
-    "frontend"
-  ],
+  "name": "melanski-sport-backend",
+  "version": "2.0.0",
+  "description": "Backend do catálogo Melanski Sport - Modernizado com RBAC e Auditoria",
+  "main": "backend/src/server.js",
+  "type": "commonjs",
   "scripts": {
-    "postinstall": "npm run build:frontend --if-present",
-    "build:frontend": "cd frontend && npm run build",
-    "start": "cd backend && npm start",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "test:backend": "cd backend && npm test",
-    "test:frontend": "cd frontend && npm test",
-    "test": "npm run test:backend && npm run test:frontend",
-    "deploy:local": "npm run build:frontend && cd scripts && deploy.bat"
+    "postinstall": "cd frontend && npm install && npm run build",
+    "start": "node backend/src/server.js",
+    "dev": "nodemon backend/src/server.js",
+    "create-admin": "node backend/scripts/createAdminUser.js",
+    "test": "cd backend && npm test"
   },
   "keywords": [
     "ecommerce",
     "sports",
-    "fullstack",
-    "monorepo"
+    "api",
+    "nodejs",
+    "express"
   ],
   "author": "",
   "license": "ISC",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "mysql2": "^3.16.3",
+    "nodemailer": "^8.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0"
   }
 }
