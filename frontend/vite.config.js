@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/',
   build: {
-    outDir: '../public_html',
+    // Hostinger: sai de frontend, sai de nodejs, entra em public_html
+    outDir: '../../public_html',
     emptyOutDir: true
   }
 })
