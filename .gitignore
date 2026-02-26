@@ -50,6 +50,7 @@ Thumbs.db
 
 # --- Documentacao e Anotacoes do Kiro ---
 Kiro/
+.kiro/
 
 # --- Testes de Exploracao e Preservacao (Documentacao Tecnica) ---
 backend/src/test/bugConditionExploration.test.js
