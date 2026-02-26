@@ -2,16 +2,16 @@
 
 Sistema fullstack de catálogo de produtos esportivos com backend Node.js/Express e frontend React/Vite.
 
-## 📁 Estrutura do Projeto (Monorepo)
+## 📁 Estrutura do Projeto
 
 ```
 melanski-sport/
-├── package.json          # Orquestrador principal (workspaces)
+├── package.json          # Package.json principal (deploy)
 ├── backend/              # API Node.js/Express
-│   ├── package.json      # Dependências do backend
+│   ├── package.json      # Dependências do backend (dev local)
 │   └── src/
 ├── frontend/             # Interface React/Vite
-│   ├── package.json      # Dependências do frontend
+│   ├── package.json      # Dependências do frontend (dev local)
 │   └── src/
 ├── public_html/          # Build do frontend (gerado automaticamente)
 └── scripts/              # Scripts de deploy
@@ -21,42 +21,42 @@ melanski-sport/
 
 ### Desenvolvimento Local
 
-1. **Instalar todas as dependências:**
-   ```bash
-   npm install
-   ```
-   Isso irá:
-   - Instalar dependências do backend
-   - Instalar dependências do frontend
-   - Fazer build do frontend automaticamente (via postinstall)
+**Opção 1: Instalar tudo de uma vez (da raiz)**
+```bash
+npm install
+```
+Isso irá:
+- Instalar dependências do backend
+- Instalar dependências do frontend
+- Fazer build do frontend automaticamente
 
-2. **Rodar backend em modo desenvolvimento:**
-   ```bash
-   npm run dev:backend
-   ```
+**Opção 2: Instalar separadamente**
 
-3. **Rodar frontend em modo desenvolvimento:**
-   ```bash
-   npm run dev:frontend
-   ```
+Backend:
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-4. **Rodar ambos simultaneamente:**
-   ```bash
-   npm run dev
-   ```
-   (Requer `concurrently` instalado globalmente: `npm install -g concurrently`)
+Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ### Deploy na Hostinger
 
-A Hostinger detecta automaticamente a estrutura de monorepo e executa:
+A Hostinger detecta automaticamente a estrutura e executa:
 
 1. `npm install` na raiz
-2. npm workspaces instala backend e frontend
+2. Instala dependências do backend
 3. Hook `postinstall` builda o frontend
 4. Arquivos vão para `public_html/`
 5. Backend inicia com `npm start`
 
-**Não é necessário fazer nada manualmente!** A Hostinger cuida de tudo.
+**Não é necessário fazer nada manualmente!**
 
 ## 📝 Scripts Disponíveis
 
