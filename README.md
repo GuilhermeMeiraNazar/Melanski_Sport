@@ -1,229 +1,150 @@
-# 🏆 Melanski Sport - E-commerce Modernizado
+# Melanski Sport - Catálogo de Produtos Esportivos
 
-Sistema completo de e-commerce para artigos esportivos com painel administrativo avançado, controle de acesso baseado em funções (RBAC), gerenciamento dinâmico de categorias e sistema de auditoria.
+Sistema fullstack de catálogo de produtos esportivos com backend Node.js/Express e frontend React/Vite.
 
-## ✨ Funcionalidades Principais
+## 📁 Estrutura do Projeto (Monorepo)
 
-### 🛍️ Loja Virtual
-- Catálogo de produtos com filtros dinâmicos
-- Sistema de carrinho de compras
-- Visualização de produtos com galeria de imagens
-- Filtros por time, categoria, gênero e tamanho
-- Produtos em destaque e lançamentos
-
-### 🔐 Sistema de Autenticação
-- Login com email e senha
-- Autenticação JWT com tokens seguros
-- 4 níveis de acesso (Developer, Administrator, Operator, Client)
-- Controle de permissões granular (RBAC)
-- Sessões seguras com expiração
-
-### 📦 Painel Administrativo
-- Gerenciamento completo de produtos (CRUD)
-- Upload de até 5 imagens por produto
-- Gerenciamento dinâmico de categorias
-- Sistema de estoque por tamanho
-- Controle de descontos e promoções
-- Visualização de logs de auditoria
-
-### 📊 Sistema de Auditoria
-- Registro automático de todas as ações
-- Histórico completo de alterações
-- Detalhes em JSON (antes/depois)
-- Rastreabilidade por usuário
-- Interface de visualização com paginação
-
-### 🖼️ Integração com Cloudinary
-- Upload otimizado de imagens
-- Redimensionamento automático
-- Deleção inteligente de imagens antigas
-- CDN global para performance
-
-## 🚀 Início Rápido
-
-### Pré-requisitos
-- Node.js 18+
-- MySQL 8.0+
-- Conta Cloudinary
-
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/seu-usuario/Melanski_Sport.git
-cd Melanski_Sport
+```
+melanski-sport/
+├── package.json          # Orquestrador principal (workspaces)
+├── backend/              # API Node.js/Express
+│   ├── package.json      # Dependências do backend
+│   └── src/
+├── frontend/             # Interface React/Vite
+│   ├── package.json      # Dependências do frontend
+│   └── src/
+├── public_html/          # Build do frontend (gerado automaticamente)
+└── scripts/              # Scripts de deploy
 ```
 
-### 2. Configurar Backend
-```bash
-cd backend
-npm install
-```
+## 🚀 Instalação e Configuração
 
-Criar arquivo `.env`:
-```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=sua_senha
-DB_NAME=melanski_sport
-JWT_SECRET=sua_chave_secreta_forte
-CLOUDINARY_CLOUD_NAME=seu_cloud_name
-CLOUDINARY_API_KEY=sua_api_key
-CLOUDINARY_API_SECRET=seu_api_secret
-PORT=3000
-```
+### Desenvolvimento Local
 
-### 3. Configurar Banco de Dados
-```bash
-mysql -u root -p melanski_sport < backend/database_migration.sql
-cd backend
-node scripts/createAdminUser.js
-```
+1. **Instalar todas as dependências:**
+   ```bash
+   npm install
+   ```
+   Isso irá:
+   - Instalar dependências do backend
+   - Instalar dependências do frontend
+   - Fazer build do frontend automaticamente (via postinstall)
 
-### 4. Configurar Frontend
-```bash
-cd frontend
-npm install
-```
+2. **Rodar backend em modo desenvolvimento:**
+   ```bash
+   npm run dev:backend
+   ```
 
-### 5. Iniciar Servidores
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
+3. **Rodar frontend em modo desenvolvimento:**
+   ```bash
+   npm run dev:frontend
+   ```
 
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
-```
+4. **Rodar ambos simultaneamente:**
+   ```bash
+   npm run dev
+   ```
+   (Requer `concurrently` instalado globalmente: `npm install -g concurrently`)
 
-### 6. Acessar o Sistema
-- Loja: http://localhost:5173
-- Login: `admin@melanski.com` / `admin123`
+### Deploy na Hostinger
 
-## 📚 Documentação
+A Hostinger detecta automaticamente a estrutura de monorepo e executa:
 
-- [📖 Guia de Implementação](IMPLEMENTACAO.md) - Documentação completa
-- [⚡ Guia Rápido](GUIA_RAPIDO.md) - Início em 5 minutos
-- [🏗️ Arquitetura](ARQUITETURA.md) - Diagramas e fluxos
-- [🚀 Deploy](DEPLOY.md) - Guia de produção
-- [📊 Resumo Executivo](RESUMO_EXECUTIVO.md) - Visão geral
+1. `npm install` na raiz
+2. npm workspaces instala backend e frontend
+3. Hook `postinstall` builda o frontend
+4. Arquivos vão para `public_html/`
+5. Backend inicia com `npm start`
 
-## 🔑 Níveis de Acesso
+**Não é necessário fazer nada manualmente!** A Hostinger cuida de tudo.
 
-| Role | Loja | Admin | Criar | Editar | Deletar | Categorias | Logs |
-|------|------|-------|-------|--------|---------|------------|------|
-| Client | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Operator | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Administrator | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Developer | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+## 📝 Scripts Disponíveis
 
-## 🛠️ Tecnologias
+### Scripts Principais
+
+- `npm install` - Instala todas as dependências e builda o frontend
+- `npm start` - Inicia o backend em produção
+- `npm run dev` - Roda backend e frontend simultaneamente
+- `npm test` - Roda todos os testes (backend + frontend)
+
+### Scripts Específicos
+
+- `npm run dev:backend` - Roda apenas o backend em modo dev
+- `npm run dev:frontend` - Roda apenas o frontend em modo dev
+- `npm run build:frontend` - Builda o frontend manualmente
+- `npm run test:backend` - Roda testes do backend
+- `npm run test:frontend` - Roda testes do frontend
+- `npm run deploy:local` - Deploy local usando script Windows
+
+## 🔧 Configuração do Backend
+
+1. Copie `.env.example` para `.env` na pasta `backend/`
+2. Configure as variáveis de ambiente:
+   ```env
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=sua_senha
+   DB_NAME=melanski_sport
+   JWT_SECRET=seu_secret_jwt
+   PORT=5000
+   ```
+
+3. Crie o banco de dados:
+   ```bash
+   cd backend
+   npm run create-admin
+   ```
+
+## 🌐 URLs
+
+- **Frontend (dev):** http://localhost:5173
+- **Backend (dev):** http://localhost:5000
+- **Backend API:** http://localhost:5000/api
+
+## 📦 Tecnologias
 
 ### Backend
 - Node.js + Express
-- MySQL2
-- JWT (jsonwebtoken)
-- Bcrypt.js
-- Cloudinary SDK
+- MySQL
+- JWT Authentication
+- Cloudinary (upload de imagens)
+- Nodemailer (emails)
 
 ### Frontend
 - React 19
-- React Router DOM
+- Vite
+- React Router
 - Axios
-- SCSS
-- React Icons
+- SASS
 
-## 📁 Estrutura do Projeto
+## 🧪 Testes
 
-```
-Melanski_Sport/
-├── backend/
-│   ├── src/
-│   │   ├── config/          # Configurações (DB, Cloudinary)
-│   │   ├── controllers/     # Lógica de negócio
-│   │   ├── middleware/      # Auth e RBAC
-│   │   ├── routes/          # Rotas da API
-│   │   ├── services/        # Serviços (Upload, etc)
-│   │   ├── utils/           # Utilitários (Logger)
-│   │   └── server.js        # Servidor principal
-│   ├── scripts/             # Scripts auxiliares
-│   └── database_migration.sql
-├── frontend/
-│   ├── src/
-│   │   ├── assets/          # SCSS e imagens
-│   │   ├── components/      # Componentes React
-│   │   ├── pages/           # Páginas (Home, Admin)
-│   │   ├── services/        # API client
-│   │   └── App.jsx
-│   └── public/
-└── docs/                    # Documentação
-```
-
-## 🔧 Scripts Disponíveis
-
-### Backend
 ```bash
-npm start             # Iniciar em produção
-npm run dev           # Iniciar em desenvolvimento
-npm run create-admin  # Criar usuário admin
+# Todos os testes
+npm test
+
+# Apenas backend
+npm run test:backend
+
+# Apenas frontend
+npm run test:frontend
 ```
 
-### Frontend
-```bash
-npm run dev        # Servidor de desenvolvimento
-npm run build      # Build para produção
-npm run preview    # Preview do build
-```
+## 📚 Documentação Adicional
 
-## 🐛 Troubleshooting
-
-### Erro de Conexão com Banco
-```bash
-# Verificar se MySQL está rodando
-mysql -u root -p
-
-# Verificar credenciais no .env
-```
-
-### Token Inválido
-```bash
-# Fazer logout e login novamente
-# Verificar JWT_SECRET no .env
-```
-
-### Imagens não Carregam
-```bash
-# Verificar credenciais Cloudinary
-# Verificar CORS do Cloudinary
-```
-
-## 📝 Changelog
-
-### v2.0.0 (2026-02-21)
-- ✅ Sistema de autenticação JWT
-- ✅ RBAC com 4 níveis de acesso
-- ✅ Gerenciamento dinâmico de categorias
-- ✅ Sistema de logs de auditoria
-- ✅ Integração avançada com Cloudinary
-- ✅ Interface administrativa modernizada
-
-### v1.0.0 (2024)
-- Lançamento inicial
-- CRUD de produtos
-- Carrinho de compras
-- Filtros básicos
+- [Backend README](./backend/README.md)
+- [Frontend README](./frontend/README.md)
+- [Scripts de Deploy](./scripts/README.md)
+- [Guia de Deploy Hostinger](./Kiro/GUIA_RAPIDO_DEPLOY.md)
 
 ## 🤝 Contribuindo
 
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+1. Clone o repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
 ## 📄 Licença
 
-Este projeto está sob a licença ISC.
-
----
-
-**Desenvolvido com ❤️ para Melanski Sport**
+ISC
